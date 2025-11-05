@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - AI Academic Risk Prediction</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+}
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.nav {
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    height: 100px;
+    line-height: 100px;
+    background: linear-gradient(rgba(39, 39, 39, 0.8), transparent);
+    z-index: 100;
+}
+.nav-logo p {
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.nav-menu ul {
+    display: flex;  
+}
+.nav-menu ul li {
+    list-style: none;
+}
+.nav-menu ul li .link {
+    text-decoration: none;
+    font-weight: 500;
+    color: #fff;
+    padding-bottom: 15px;
+    margin: 0 25px;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+.link:hover, .action {
+    border-bottom: 2px solid #fff;
+    color: #ffd700;
+}
+.nav-button {
+    display: flex;
+    align-items: center;
+}
+.nav-button .btn {
+    background: #ffd700;
+    color: #1e3c72;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-left: 20px;
+    font-weight: 600;
+    width: 130px;
+    height: 40px;
+    transition: .3s ease;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.1);
+}
+#registerBtn {
+    margin-left: 15px;
+}
+.btn.white-btn{
+    background-color: #fff;
+    color: #1e3c72;
+}
+.btn:hover {
+    background: #fff;
+    color: #2a5298;
+}
+.nav-menu-btn {
+    display: none;
+}
+header {
+    background: rgba(0,0,0,0.8);
+    padding: 40px 0 20px 0;
+    text-align: center;
+    color: #ffd700;
+    margin-top: 100px;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.1);
+}
+header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+header p {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 30px auto 80px auto;
+    padding: 40px 30px 30px 30px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(30,60,114,0.13);
+    backdrop-filter: blur(2px);
+}
+.container h2 {
+    color: #ffd700;
+    margin-bottom: 15px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+.container p {
+    color: #fff;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+.team-section {
+    margin-top: 40px;
+}
+.team-title {
+    color: #ffd700;
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-align: center;
+}
+.team-members {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 35px;
+}
+.member-card {
+    background: rgba(255,255,255,0.18);
+    border-radius: 16px;
+    padding: 25px 20px 20px 20px;
+    width: 230px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(30,60,114,0.10);
+    transition: transform 0.2s;
+}
+.member-card:hover {
+    transform: translateY(-8px) scale(1.04);
+    box-shadow: 0 6px 24px rgba(30,60,114,0.18);
+}
+.member-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #ffd700;
+    background: #fff;
+}
+.member-name {
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.member-role {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+.member-social a {
+    color: #fff;
+    margin: 0 7px;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+.member-social a:hover {
+    color: #ffd700;
+}
+footer {
+    background: #1e3c72;
+    color: #fff;
+    text-align: center;
+    padding: 18px 0 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    box-shadow: 0 -2px 8px rgba(30,60,114,0.08);
+}
+@media only screen and (max-width: 900px) {
+    .team-members {
+        flex-direction: column;
+        align-items: center;
+    }
+    .container {
+        padding: 30px 10px 20px 10px;
+    }
+}
+@media only screen and (max-width: 786px) {
+    .nav-button {
+        display: none;
+    }
+    .nav-menu.resonsive {
+        top: 100px;
+    }
+    .nav-menu{
+        position: absolute;
+        top: -800px;
+        display: flex;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        width: 100%;
+        height: 90vh;
+        backdrop-filter: blur(20px);
+        transition: .3s;
+    }
+    .nav-menu ul {
+        flex-direction: column;
+        text-align: center;
+    }
+    .nav-menu-btn {
+        display:block;
+    }
+    .nav-menu-btn i {
+        font-size: 25px;
+        color: #fff;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: .3s;
+    }
+    .nav-menu-btn i:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    header {
+        margin-top: 80px;
+        padding: 30px 0 15px 0;
+    }
+    .container {
+        margin: 20px auto 80px auto;
+    }
+}
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <nav class="nav">
+        <div class="nav-logo">
+            <p><i class="fas fa-graduation-cap"></i> Student Risk Prediction</p>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <ul>
+                <li><a href="Login.html" class="link">Home</a></li>
+                <li><a href="#" class="link">Blog</a></li>
+                <li><a href="Service.html" class="link">Service</a></li>
+                <li><a href="About.html" class="link action">About</a></li>
+            </ul>
+        </div>
+        <div class="nav-button">
+            <button class="btn white-btn" id="loginBtn" onclick="login()">Log In</button>
+        </div>
+        <div class="nav-menu-btn">
+            <i class="fas fa-bars" onclick="myMenuFunction()"></i>
+        </div>
+    </nav>
+    <header>
+        <h1>About Our Platform</h1>
+        <p>Empowering student success with AI-driven insights at the University of Zululand</p>
+    </header>
+    <div class="container">
+        <h2>Who We Are</h2>
+        <p>
+            <strong>AI-Powered Student Academic Risk Prediction System</strong> is a passionate team of Computer Science, and MIS Students dedicated to enhancing academic success at the <strong>University of Zululand</strong>. Our platform leverages <em>artificial intelligence</em> and <em>machine learning</em> to identify students at risk of academic failure early, enabling timely interventions and personalized support.
+        </p>
+        <h2>Our Mission</h2>
+        <p>
+            We aim to transform higher education by enabling data-driven decisions that improve student retention, performance, and overall success. By turning raw student data into actionable insights, we empower educators and institutions to create a supportive and proactive learning environment.
+        </p>
+        <div class="team-section">
+            <div class="team-title"><i class="fas fa-users"></i> Meet Our Team</div>
+            <div class="team-members">
+                <div class="member-card">
+                    <img src="image/Maduna.jpg" alt="Team Member" class="member-photo">
+                    <div class="member-name">Simphiwe Maduna</div>
+                    <div class="member-role">Project Manager</div>
+                    <div class="member-social">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="member-card">
+                    <img src="image/Sandile.jpg" alt="Team Member" class="member-photo">
+                    <div class="member-name">Sandile Makhweyeni</div>
+                    <div class="member-role">Developer</div>
+                    <div class="member-social">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="member-card">
+                    <img src="image/Asive.jpg" alt="Team Member" class="member-photo">
+                    <div class="member-name">Miss A Sifaya</div>
+                    <div class="member-role">Developer & Documentation Specialist</div>
+                    <div class="member-social">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="member-card">
+                    <img src="image/Senarh.jpg" alt="Team Member" class="member-photo">
+                    <div class="member-name">Miss CS Msweli</div>
+                    <div class="member-role">Researcher</div>
+                    <div class="member-social">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-dribbble"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 AI-Powered Student Academic Risk Prediction System. All rights reserved.</p>
+    </footer>
+    <script>
+        const navMenu = document.getElementById("navMenu");
+        function myMenuFunction() {
+            navMenu.classList.toggle("resonsive");
+        }
+        function login() {
+            window.location.href = "Login.html";
+        }
+    </script>
+</div>
+</body>
+</html>

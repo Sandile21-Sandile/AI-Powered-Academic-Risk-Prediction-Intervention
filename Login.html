@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Academic Risk Prediction & Intervention Platform //Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Your existing CSS here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background-color: blue;
+            background-image: url(image/logo1.jpg);
+        }
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 110vh;
+            background: rgba(39, 39, 39, 0.4);
+        }
+        .nav {
+            position: fixed;
+            top: 0;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            height: 100px;
+            line-height: 100px;
+            background: linear-gradient(rgba(39, 39, 39, 0.6), transparent);
+            z-index: 100;
+        }
+        .nav-logo p {
+            color: #fff;
+            font-size: 30px;
+            font-weight: 600;
+        }
+        .nav-menu ul {
+            display: flex;
+        }
+        .nav-menu ul li {
+            list-style: none;
+        }
+        .nav-menu ul li .link {
+            text-decoration: none;
+            font-weight: 500;
+            color: #fff;
+            padding-bottom: 15px;
+            margin: 0 25px;
+        }
+        .link:hover, .action {
+            border-bottom: 2px solid #fff;
+        }
+        .nav-button {
+            display: flex;
+            align-items: center;
+        }
+        .nav-button .btn {
+            background: #c7b0b0;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-left: 20px;
+            font-weight: 500;
+            width: 130px;
+            height: 40px;
+            transition: .3s ease;
+        }
+        .btn.white-btn{
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .btn.btn.white:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .nav-menu-btn {
+            display: none;
+        }
+        .form-box {
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            width: 512px;
+            height: 300px;
+            border: #7b84c0 1px solid;
+            z-index: 2;
+            border-radius: 14px;
+            background: rgba(184, 161, 161, 0.2);
+            backdrop-filter: blur(20px);
+        }
+        .login-container {
+            position: absolute;
+            left: 4px;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            transition: .5s ease-in-out;
+        }
+        .top span {
+            color: #fff;
+            font-size: small;
+            padding: 10px 0;
+            justify-content: center;
+        }
+        .top span a {
+            color: #fff;
+            margin-left: 5px;
+            font-weight: 500;
+        }
+        header {
+            color: #fff;
+            font-size: 30px;
+            text-align: center;
+            padding: 10px 0 30px 0;
+        }
+        .two-forms {
+            display: flex;
+            gap: 10px;
+        }
+        header {
+            font-size: 30px;
+            text-align: center;
+            color: #fff;
+            padding: 10px 0 30px 0;
+        }
+        .two-forms {
+            display: flex;
+            gap: 10px;
+        }
+        .input-field {
+            margin-bottom: 5px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            height: 50px;
+            width: 100%;
+            padding: 0 10px 0 45px;
+            border: none;
+            border-radius: 30px;
+            outline: none;
+            transition: .2s ease;
+        }
+        .input-field:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        ::-webkit-input-placeholder {
+            color: #fff;
+        }
+        .input-box i{
+            position: relative;
+            top: -35px;
+            left: 17px;
+            color: #fff;
+        }
+        .submit {
+            font-size: 15px;
+            font-weight: 500;
+            color:black;
+            height: 45px;
+            width: 100%;
+            border: none;
+            border-radius: 30px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: .3s ease-in-out;
+        }
+        .submit:hover {
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 1px 5px 7px 1px rgba(0, 0, 0, 0.2);
+        }
+        .two-col{
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            font-size: small;
+            margin-top: 10px;
+        }
+        .two-col .one{
+            display: flex;
+            gap: 5px;
+        }
+        .two label a{
+            color: #fff;
+            text-decoration: none;
+        }
+        .two label a:hover {
+            text-decoration: underline;
+        }
+        @media only screen and (max-width: 786px) {
+            .nav-button {
+                display: none;
+            }
+            .nav-menu.resonsive {
+                top: 100px;
+            }
+            .nav-menu{
+                position: absolute;
+                top: -800px;
+                display: flex;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.2);
+                width: 100%;
+                height: 90vh;
+                backdrop-filter: blur(20px);
+                transition: .3s;
+            }
+            .nav-menu ul {
+                flex-direction: column;
+                text-align: center;
+            }
+            .nav-menu-btn {
+                display:block;
+            }
+            .nav-menu-btn i {
+                font-size: 25px;
+                color: #fff;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                cursor: pointer;
+                transition: .3s;
+            }
+            .nav-menu-btn i:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+        @media only screen and (max-width: 540px) {
+            .wrapper {
+                min-height: 100vh;
+            }
+            .form-box {
+                width: 100%;
+                height: 500px;
+            }
+            .register-container, .login-container {
+                width: 100%;
+                padding: 0;
+            }
+            .register-container .two-forms {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        /* Custom Message Box Styles */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <nav class="nav">
+        <div class="nav-logo">
+            <p><i class="fa fa-graduation-cap"></i> Student Risk Prediction</p>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <ul>
+                <li><a href="Login.html" class="link action">Home</a></li>
+                <li><a href="Service.html" class="link">Service</a></li>
+                <li><a href="About.html" class="link">About</a></li>
+            </ul>
+        </div>
+        <div class="nav-button">
+            <button class="btn white-btn" onclick="window.location.href='Login.html'">Log In</button>
+        </div>
+        <div class="nav-menu-btn">
+            <i class="bx bx-menu" onclick="myMenuFunction()"></i>
+        </div>
+    </nav>
+
+    <div class="form-box">
+        <div class="login-container" id="login">
+            <div class="top">
+                <header>Login</header>
+            </div>
+            <div class="input-box">
+                <input type="text" class="input-field" placeholder="Username or Email" id="username">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="input-box">
+                <input type="password" class="input-field" placeholder="Password" id="password">
+                <i class="fa fa-lock"></i>
+            </div>
+            <div class="input-box">
+                <input type="submit" class="submit" value="Log In">
+            </div>
+            <div class="two-col">
+                <div class="one">
+                <input type="checkbox" id="login-check">
+                <label for="login-check"> Remember Me</label>
+            </div>
+                <div class="two">
+                <label><a href="#">Forgot password?</a></label>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="message-box" class="message-box"></div>
+
+<script>
+    function showMessage(message) {
+        const msgBox = document.getElementById('message-box');
+        msgBox.textContent = message;
+        msgBox.style.display = 'block';
+        setTimeout(() => {
+            msgBox.style.opacity = 1;
+        }, 10);
+        
+        setTimeout(() => {
+            msgBox.style.opacity = 0;
+            msgBox.addEventListener('transitionend', () => {
+                msgBox.style.display = 'none';
+            }, { once: true });
+        }, 3000);
+    }
+
+    function myMenuFunction() {
+        var i = document.getElementById("navMenu");
+        if (i.className === "nav-menu") {
+            i.className += " responsive";
+        } else {
+            i.className = "nav-menu";
+        }
+    }
+
+    // Handle login form submission
+    document.querySelector('.submit').addEventListener('click', async function(e) {
+        e.preventDefault();
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!username || !password) {
+            showMessage("Please enter both username/email and password.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Save user data to localStorage in the format expected by the dashboard
+                const userData = {
+                    user_id: result.user_id,
+                    role: result.role,
+                    first_name: result.first_name || result.full_name || 'User',
+                    last_name: result.last_name || ''
+                };
+                
+                localStorage.setItem('user_data', JSON.stringify(userData));
+                
+                showMessage(`Login successful! Welcome, ${userData.first_name}`);
+
+                // After successful login API response
+                localStorage.setItem('user_name', result.full_name || result.first_name || 'Unknown');
+                localStorage.setItem('user_role', result.role || 'Unknown');
+                // Redirect based on the user's role
+                setTimeout(() => {
+                    if (result.role === "student") {
+                        window.location.href = "student_dashboard.html";
+                    } else if (result.role === "lecturer") {
+                        window.location.href = "Dashboard Calculator.html"; 
+                    } else if (result.role === "admin") {
+                        window.location.href = "unizulu-dashboard1-mysql.html";
+                    }
+                }, 1500);
+            } else {
+                showMessage(result.message || "An unknown error occurred.");
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            showMessage("An error occurred. Please check if the server is running on http://127.0.0.1:5000");
+        }
+    });
+
+    // Also allow form submission by pressing Enter key
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.querySelector('.submit').click();
+        }
+    });
+</script>
+</body>
+</html>

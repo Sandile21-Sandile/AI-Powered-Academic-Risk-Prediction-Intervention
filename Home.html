@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Prediction - UniZulu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #005599;
+            --accent-color: #e3eaf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e3f0ff 0%, #f9fafb 100%);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--primary-color) 60%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2.5rem 1rem 1.5rem 1rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        
+        header h1 {
+            font-size: 2.7rem;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: 2px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            margin: 0;
+            opacity: 0.92;
+        }
+        
+        nav {
+            background: #fff;
+            box-shadow: 0 4px 18px rgba(0,51,102,0.10);
+            padding: 0.7rem 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            border-bottom: 2px solid #e3eaf6;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--primary-color);
+            margin: 0 0.7rem;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.08rem;
+            padding: 0.6rem 1.4rem;
+            border-radius: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6em;
+            background: transparent;
+            transition: 
+                background 0.22s cubic-bezier(.4,0,.2,1),
+                color 0.22s cubic-bezier(.4,0,.2,1),
+                box-shadow 0.18s;
+            box-shadow: 0 0px 0px rgba(0,51,102,0);
+            position: relative;
+        }
+        
+        nav a i {
+            font-size: 1.15em;
+            transition: color 0.2s;
+        }
+        
+        nav a.active, nav a:hover {
+            background: linear-gradient(90deg, var(--accent-color) 60%, #d0e3fa 100%);
+            color: var(--secondary-color);
+            box-shadow: 0 2px 12px rgba(0,51,102,0.07);
+        }
+        
+        nav a.active i, nav a:hover i {
+            color: var(--secondary-color);
+        }
+        
+        nav a::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color) 60%, var(--primary-color) 100%);
+            border-radius: 2px;
+            transition: width .3s;
+            margin: 0 auto;
+            position: absolute;
+            left: 20%;
+            right: 20%;
+            bottom: 8px;
+        }
+        
+        nav a.active::after, nav a:hover::after {
+            width: 60%;
+        }
+        
+        @media (max-width: 700px) {
+            nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.5rem 0;
+            }
+            nav a {
+                font-size: 1rem;
+                padding: 0.5rem 1rem;
+                margin: 0.2rem 0;
+            }
+        }
+        
+        .hero {
+            background: linear-gradient(120deg, var(--accent-color) 60%, #fff 100%);
+            padding: 2.5rem 1rem 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 32px 32px;
+            box-shadow: 0 4px 24px rgba(0,51,102,0.07);
+            margin-bottom: 2rem;
+        }
+        
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+        }
+        
+        .hero p {
+            font-size: 1.15rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero .cta-btn {
+            background: linear-gradient(90deg, var(--primary-color) 60%, var(--secondary-color) 100%);
+            color: #fff;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,51,102,0.12);
+            transition: background 0.2s, transform 0.2s;
+        }
+        
+        .hero .cta-btn:hover {
+            background: linear-gradient(90deg, var(--secondary-color) 60%, var(--primary-color) 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,51,102,0.07);
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+        }
+        
+        .feature-card {
+            flex: 1 1 220px;
+            background: #f5f8fd;
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,51,102,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 6px 24px rgba(0,51,102,0.10);
+        }
+        
+        .feature-card i {
+            font-size: 2.3rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.7rem;
+        }
+        
+        .feature-card h4 {
+            margin: 0.5rem 0 0.3rem 0;
+            font-size: 1.15rem;
+            color: var(--primary-color);
+        }
+        
+        .feature-card p {
+            font-size: 0.98rem;
+            color: #444;
+        }
+        
+        .graph-section, .workflow-section, .resources-section {
+            margin-top: 2.5rem;
+            padding: 1.5rem 1rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .graph-section h3, .workflow-section h3, .resources-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .workflow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 1rem;
+            gap: 1rem;
+        }
+        
+        .workflow-step {
+            flex: 1 1 180px;
+            background: var(--accent-color);
+            margin: 0.5rem 0;
+            padding: 1.2rem 0.7rem;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            min-width: 160px;
+            box-shadow: 0 1px 6px rgba(0,51,102,0.04);
+        }
+        
+        .workflow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 4px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+            z-index: 1;
+        }
+        
+        .workflow-icon {
+            font-size: 2.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .resource-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,51,102,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--accent-color);
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,51,102,0.12);
+        }
+        
+        .resource-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .resource-card h4 {
+            color: var(--primary-color);
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .resource-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .resource-btn {
+            background: linear-gradient(90deg, var(--primary-color) 60%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        
+        .resource-btn:hover {
+            background: linear-gradient(90deg, var(--secondary-color) 60%, var(--primary-color) 100%);
+        }
+        
+        .user-status-bar {
+            background: linear-gradient(90deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .user-status-bar.logged-out {
+            background: linear-gradient(90deg, var(--warning-color) 0%, #d97706 100%);
+        }
+        
+        .user-status-bar .user-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-status-bar .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            transition: background 0.2s;
+        }
+        
+        .user-status-bar .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Role-specific dashboard options - Hidden by default */
+        #studentDashboardLink, #lecturerDashboardLink, #adminDashboardLink {
+            display: none;
+        }
+        
+        /* Security notification */
+        .security-notice {
+            background: #fef3cd;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #92400e;
+            display: none;
+        }
+        
+        /* Login modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, var(--primary-color) 60%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(90deg, var(--secondary-color) 60%, var(--primary-color) 100%);
+        }
+        
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 900px) {
+            .features, .workflow-steps {
+                flex-direction: column;
+                gap: 1.2rem;
+            }
+            .container {
+                padding: 1rem;
+            }
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.2rem 0 1rem 0;
+            background: linear-gradient(90deg, var(--primary-color) 60%, var(--secondary-color) 100%);
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-top: 2rem;
+            border-radius: 18px 18px 0 0;
+        }
+    </style>
+    <!-- Chart.js CDN for graph rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- User Status Bar -->
+    <div id="userStatusBar" class="user-status-bar">
+        <div class="user-info">
+            <span id="statusMessage"></span>
+            <button id="logoutBtn" class="logout-btn" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <header>
+        <h1><i class="fa-solid fa-graduation-cap"></i> University Of Zululand</h1>
+        <p>AI-Powered Academic Risk Prediction Platform</p>
+    </header>
+    
+    <!-- Security Notice -->
+    <div id="securityNotice" class="security-notice">
+        <i class="fas fa-shield-alt"></i> 
+        <strong>Security Notice:</strong> Dashboard access is restricted based on user role. Unauthorized access attempts are logged.
+    </div>
+    
+    <nav>
+        <a href="Home.html" class="active"><i class="fa-solid fa-house"></i> Home</a>
+        <!-- Dashboard links will be dynamically shown based on user role -->
+        <a href="student_dashboard.html" id="studentDashboardLink"><i class="fa-solid fa-user-graduate"></i> Student Dashboard</a>
+        <a href="Dashboard Calculator.html" id="lecturerDashboardLink"><i class="fa-solid fa-chalkboard-user"></i> Lecturer Dashboard</a>
+        <a href="unizulu-dashboard1-mysql.html" id="adminDashboardLink"><i class="fa-solid fa-user-shield"></i> Admin Dashboard</a>
+        <a href="#" id="loginLink"><i class="fa-solid fa-user-lock"></i> Login</a>
+    </nav>
+    
+    <section class="hero">
+        <h2>Welcome to Your Academic Success Platform</h2>
+        <p>
+            Monitor your academic progress, identify potential risks, and get personalized support<br>
+            <span style="color:var(--secondary-color);font-weight:600;">Take control of your academic journey at University of Zululand.</span>
+        </p>
+        <a href="#" id="heroButton"><button class="cta-btn"><i class="fa-solid fa-chart-simple"></i> View My Dashboard</button></a>
+    </section>
+    
+    <div class="container" id="content">
+        <div class="features">
+            <div class="feature-card">
+                <i class="fa-solid fa-chart-line"></i>
+                <h4>Track Your Progress</h4>
+                <p>Monitor your academic performance, attendance, and engagement in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h4>Risk Alerts</h4>
+                <p>Get early warnings about potential academic risks with personalized recommendations.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-bell"></i>
+                <h4>Stay Informed</h4>
+                <p>Receive notifications about your academic status and important updates from lecturers.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-hands-helping"></i>
+                <h4>Get Support</h4>
+                <p>Access personalized resources and support when you need it most.</p>
+            </div>
+        </div>
+        
+        <!-- How It Works Section -->
+        <div class="workflow-section">
+            <h3><i class="fa-solid fa-user-graduate"></i> How to Use This Platform</h3>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="workflow-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+                    <strong>1. Login</strong>
+                    <p>Use your credentials to access your personalized dashboard</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                    <strong>2. View Dashboard</strong>
+                    <p>Check your academic performance, attendance, and risk status</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><i class="fa-solid fa-bell"></i></div>
+                    <strong>3. Read Notifications</strong>
+                    <p>Review important updates and intervention recommendations</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <strong>4. Monitor Progress</strong>
+                    <p>Track your improvement and academic journey over time</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-icon"><i class="fa-solid fa-handshake"></i></div>
+                    <strong>5. Take Action</strong>
+                    <p>Follow recommendations and seek help when needed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graph Section -->
+        <div class="graph-section">
+            <h3><i class="fa-solid fa-chart-pie"></i> Student Risk Distribution</h3>
+            <canvas id="riskChart" width="400" height="180"></canvas>
+        </div>
+
+        <!-- University Resources Section -->
+        <div class="resources-section">
+            <h3><i class="fa-solid fa-link"></i> University Resources</h3>
+            <p>Quick access to essential University of Zululand platforms and services:</p>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h4>Academic Calendar</h4>
+                    <p>Stay updated with important dates, deadlines, and university events</p>
+                    <a href="https://www.unizulu.ac.za/academic-calendar/" target="_blank" class="resource-btn">View Calendar</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h4>UniZulu Moodle</h4>
+                    <p>Access your course materials, assignments, and learning resources</p>
+                    <a href="https://learn.unizulu.ac.za/" target="_blank" class="resource-btn">Go to Moodle</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-clock"></i></div>
+                    <h4>Class Timetable</h4>
+                    <p>Check your class schedule and room allocations</p>
+                    <a href="https://www.unizulu.ac.za/class-timetable/" target="_blank" class="resource-btn">View Timetable</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-user-gear"></i></div>
+                    <h4>Student iEnabler</h4>
+                    <p>Manage your registration, fees, and academic records</p>
+                    <a href="https://jasper.unizulu.ac.za/pls/prodi41/w99pkg.mi_login" target="_blank" class="resource-btn">Access iEnabler</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-book"></i></div>
+                    <h4>University Library</h4>
+                    <p>Access research materials, e-books, and library services</p>
+                    <a href="https://library.unizulu.ac.za/" target="_blank" class="resource-btn">Visit Library</a>rrt56
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <h4>Student Email</h4>
+                    <p>Access your University of Zululand email account</p>
+                    <a href="https://outlook.office.com/mail/" target="_blank" class="resource-btn">Check Email</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3><i class="fa-solid fa-user-lock"></i> Login to Your Account</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email / Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <div id="loginMessage" style="margin-top: 15px; text-align: center;"></div>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2025 University Of Zululand AI-POWERED ACADEMIC RISK PREDICTION PLATFORM
+    </footer>
+
+    <!-- Chart.js Script -->
+    <script>
+        // Initialize chart
+        const ctx = document.getElementById('riskChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                datasets: [{
+                    data: [60, 25, 15],
+                    backgroundColor: ['#4caf50', '#ff9800', '#f44336'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Enhanced User Authentication and Role Management
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavigationBasedOnRole();
+            
+            // Setup login modal
+            const loginLink = document.getElementById('loginLink');
+            const loginModal = document.getElementById('loginModal');
+            const closeBtn = document.querySelector('.close-btn');
+            const loginForm = document.getElementById('loginForm');
+            
+            // Open modal when login link is clicked
+            loginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginModal.style.display = 'block';
+            });
+            
+            // Close modal when X is clicked
+            closeBtn.addEventListener('click', function() {
+                loginModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    loginModal.style.display = 'none';
+                }
+            });
+            
+            // Handle login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleLogin();
+            });
+            
+            // Check backend connection
+            checkBackendConnection();
+        });
+
+        // Advanced role-based navigation system
+        function updateNavigationBasedOnRole() {
+            const userStatusBar = document.getElementById('userStatusBar');
+            const statusMessage = document.getElementById('statusMessage');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const studentDashboardLink = document.getElementById('studentDashboardLink');
+            const lecturerDashboardLink = document.getElementById('lecturerDashboardLink');
+            const adminDashboardLink = document.getElementById('adminDashboardLink');
+            const loginLink = document.getElementById('loginLink');
+            const heroButton = document.getElementById('heroButton');
+            const securityNotice = document.getElementById('securityNotice');
+
+            // Check if user is logged in with encrypted verification
+            const userData = getSecurelyStoredUserData();
+            
+            if (userData && userData.role) {
+                const role = userData.role;
+                
+                // Hide all dashboard links first for maximum security
+                studentDashboardLink.style.display = 'none';
+                lecturerDashboardLink.style.display = 'none';
+                adminDashboardLink.style.display = 'none';
+                
+                // Show only authorized dashboard links based on role
+                if (role === 'student') {
+                    studentDashboardLink.style.display = 'inline-flex';
+                    
+                    // Update hero button
+                    heroButton.querySelector('button').innerHTML = '<i class="fa-solid fa-user-graduate"></i> Go to Student Dashboard';
+                    heroButton.href = 'student_dashboard.html';
+                    
+                    // Update status message
+                    statusMessage.textContent = `Welcome back, ${userData.first_name}! You are logged in as a student.`;
+                    
+                    // Log access for security auditing
+                    console.log(`Student dashboard accessed by: ${userData.first_name || 'Unknown Student'}`);
+                } 
+                else if (role === 'lecturer') {
+                    studentDashboardLink.style.display = 'inline-flex';
+                    lecturerDashboardLink.style.display = 'inline-flex';
+                    
+                    // Update hero button
+                    heroButton.querySelector('button').innerHTML = '<i class="fa-solid fa-chalkboard-user"></i> Go to Lecturer Dashboard';
+                    heroButton.href = 'Dashboard Calculator.html';
+                    
+                    // Update status message
+                    statusMessage.textContent = `Welcome back, ${userData.full_name || 'Lecturer'}! You are logged in as a lecturer.`;
+                    
+                    // Log access for security auditing
+                    console.log(`Lecturer dashboard accessed by: ${userData.full_name || 'Unknown Lecturer'}`);
+                } 
+                else if (role === 'admin') {
+                    studentDashboardLink.style.display = 'inline-flex';
+                    lecturerDashboardLink.style.display = 'inline-flex';
+                    adminDashboardLink.style.display = 'inline-flex';
+                    
+                    // Update hero button
+                    heroButton.querySelector('button').innerHTML = '<i class="fa-solid fa-user-shield"></i> Go to Admin Dashboard';
+                    heroButton.href = 'unizulu-dashboard1-mysql.html';
+                    
+                    // Update status message
+                    statusMessage.textContent = `Welcome back, ${userData.full_name || 'Administrator'}! You are logged in as an administrator.`;
+                    
+                    // Log access for security auditing
+                    console.log(`Admin dashboard accessed by: ${userData.full_name || 'Unknown Administrator'}`);
+                }
+                
+                // Update login link
+                loginLink.innerHTML = '<i class="fa-solid fa-user"></i> My Account';
+                
+                // Show user status bar
+                userStatusBar.style.display = 'block';
+                logoutBtn.style.display = 'inline-block';
+                
+                // Hide security notice for logged-in users
+                securityNotice.style.display = 'none';
+            } else {
+                // User is not logged in - Maximum security restrictions
+                studentDashboardLink.style.display = 'none';
+                lecturerDashboardLink.style.display = 'none';
+                adminDashboardLink.style.display = 'none';
+                
+                // Update hero button
+                heroButton.querySelector('button').innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login to Dashboard';
+                heroButton.href = '#';
+                heroButton.onclick = function(e) {
+                    e.preventDefault();
+                    document.getElementById('loginModal').style.display = 'block';
+                };
+                
+                // Update login link
+                loginLink.innerHTML = '<i class="fa-solid fa-user-lock"></i> Login';
+                
+                // Show logged out status
+                userStatusBar.style.display = 'block';
+                userStatusBar.classList.add('logged-out');
+                statusMessage.textContent = 'You are not logged in. Please log in to access your dashboard.';
+                logoutBtn.style.display = 'none';
+                
+                // Show security notice for logged-out users
+                securityNotice.style.display = 'block';
+            }
+
+            // Setup logout functionality
+            logoutBtn.addEventListener('click', function() {
+                logout();
+            });
+        }
+
+        // Enhanced secure user data storage with encryption simulation
+        function getSecurelyStoredUserData() {
+            try {
+                const encryptedData = localStorage.getItem('user_data_encrypted');
+                if (encryptedData) {
+                    // In a real application, this would involve proper decryption
+                    // For this demo, we'll use a simple base64 decode simulation
+                    const decodedData = atob(encryptedData);
+                    return JSON.parse(decodedData);
+                }
+                
+                // Fallback to standard storage for demo purposes
+                return JSON.parse(localStorage.getItem('user_data'));
+            } catch (error) {
+                console.error('Error retrieving user data:', error);
+                return null;
+            }
+        }
+
+        // Enhanced secure user data storage with encryption simulation
+        function setSecurelyStoredUserData(userData) {
+            try {
+                // In a real application, this would involve proper encryption
+                // For this demo, we'll use a simple base64 encode simulation
+                const encodedData = btoa(JSON.stringify(userData));
+                localStorage.setItem('user_data_encrypted', encodedData);
+                
+                // Also store in standard format for demo compatibility
+                localStorage.setItem('user_data', JSON.stringify(userData));
+            } catch (error) {
+                console.error('Error storing user data:', error);
+            }
+        }
+
+        // Handle login with backend API
+        async function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginMessage = document.getElementById('loginMessage');
+            
+            if (!username || !password) {
+                loginMessage.innerHTML = '<p style="color: red;">Please enter both username and password.</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Login successful
+                    loginMessage.innerHTML = '<p style="color: green;">Login successful! Redirecting...</p>';
+                    
+                    // Store user data securely
+                    const userData = {
+                        user_id: data.user_id,
+                        role: data.role,
+                        first_name: data.first_name || data.full_name,
+                        full_name: data.full_name,
+                        login_time: new Date().toISOString()
+                    };
+                    
+                    setSecurelyStoredUserData(userData);
+                    
+                    // Update last login time for students
+                    if (data.role === 'student') {
+                        try {
+                            await fetch(`http://127.0.0.1:5000/api/update_student_login/${data.user_id}`, {
+                                method: 'POST'
+                            });
+                        } catch (error) {
+                            console.error('Error updating student login time:', error);
+                        }
+                    }
+                    
+                    // Close modal and update UI
+                    setTimeout(() => {
+                        document.getElementById('loginModal').style.display = 'none';
+                        updateNavigationBasedOnRole();
+                    }, 1000);
+                    
+                } else {
+                    // Login failed
+                    loginMessage.innerHTML = `<p style="color: red;">${data.message || 'Login failed. Please try again.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                loginMessage.innerHTML = '<p style="color: red;">Connection error. Please try again later.</p>';
+            }
+        }
+
+        // Enhanced logout functionality with security measures
+        function logout() {
+            // Log logout event for security auditing
+            const userData = getSecurelyStoredUserData();
+            if (userData) {
+                console.log(`User logout: ${userData.first_name} (${userData.role})`);
+            }
+            
+            // Clear all user data
+            localStorage.removeItem('user_data');
+            localStorage.removeItem('user_data_encrypted');
+            sessionStorage.clear();
+            
+            // Additional security: Clear any cached data
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+            
+            updateNavigationBasedOnRole();
+            
+            // Redirect to home page after logout
+            window.location.href = 'Home.html';
+        }
+
+        // Backend connection check with actual API endpoints
+        async function checkBackendConnection() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/students', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    console.log('Backend connection successful');
+                } else {
+                    console.warn('Backend connection issue - Running in limited mode');
+                }
+            } catch (error) {
+                console.error('Backend connection failed:', error);
+            }
+        }
+
+        // Additional security: Prevent unauthorized access attempts
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('#studentDashboardLink') || 
+                e.target.closest('#lecturerDashboardLink') || 
+                e.target.closest('#adminDashboardLink')) {
+                
+                const userData = getSecurelyStoredUserData();
+                if (!userData) {
+                    e.preventDefault();
+                    alert('Unauthorized access attempt detected. Please log in first.');
+                    document.getElementById('loginModal').style.display = 'block';
+                } else {
+                    // Log dashboard access for security auditing
+                    console.log(`Dashboard accessed by ${userData.first_name} (${userData.role})`);
+                }
+            }
+        });
+
+        // Session timeout and security monitoring
+        let inactivityTime = function () {
+            let time;
+            window.onload = resetTimer;
+            document.onmousemove = resetTimer;
+            document.onkeypress = resetTimer;
+            
+            function logout() {
+                // Only logout if user is logged in
+                const userData = getSecurelyStoredUserData();
+                if (userData) {
+                    console.log('Auto-logout due to inactivity');
+                    alert('Your session has expired due to inactivity.');
+                    logout();
+                }
+            }
+            
+            function resetTimer() {
+                clearTimeout(time);
+                time = setTimeout(logout, 30 * 60 * 1000); // 30 minutes
+            }
+        };
+        
+        // Start inactivity timer
+        inactivityTime();
+    </script>
+</body>
+</html>

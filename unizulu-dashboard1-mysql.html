@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University of Zululand Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unizulu Dashboard - Risk Alert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#0d6efd,#6610f2);
+            color: white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow: 0 6px 18px rgba(13,110,253,0.25);
+            cursor:pointer;
+            z-index: 1050;
+        }
+        .fab.pinned { right: 92px; }
+        .fab .fa-bell { font-size: 24px; }
+
+        /* Small helper to make modal body taller on large screens */
+        @media(min-width:768px){
+            .modal-dialog { max-width:720px; }
+            .modal-body textarea { min-height:160px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Existing dashboard content can go here (left minimal). -->
+    <div class="container py-4">
+        <h1 class="mb-3">Unizulu Dashboard</h1>
+        <p>This page contains the dashboard UI. Use the floating alert button to create and send risk alerts.</p>
+        <!-- You can paste additional dashboard content below -->
+    </div>
+
+    <!-- Floating Action Button -->
+    <div id="fab" class="fab" title="Send Alert" role="button" aria-label="Send alert">
+        <i class="fa fa-bell"></i>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertModalLabel">Send Risk Alert</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="/">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="studentName" class="form-label">Student name</label>
+                            <input id="studentName" name="studentName" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="studentEmail" class="form-label">Student email</label>
+                            <input id="studentEmail" name="studentEmail" type="email" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="riskLevel" class="form-label">Risk level</label>
+                            <select id="riskLevel" name="riskLevel" class="form-select">
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="alertMessage" class="form-label">Alert message</label>
+                            <textarea id="alertMessage" name="alertMessage" class="form-control" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="recommendations" class="form-label">Recommendations</label>
+                            <textarea id="recommendations" name="recommendations" class="form-control"></textarea>
+                        </div>
+
+                        <!-- Optional admin-only force send checkbox; server honors ALLOW_REAL_SENDS -->
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="1" id="forceSend" name="force_send">
+                            <label class="form-check-label" for="forceSend">Force real send (admin only)</label>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send Alert</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        // Toggle modal when FAB clicked. Also allow pinning behavior (click to pin/unpin reposition)
+        const fab = document.getElementById('fab');
+        const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+        let pinned = false;
+        fab.addEventListener('click', (e) => {
+            // If user alt-click (or shift-click) toggle pin state instead
+            if (e.altKey || e.shiftKey) {
+                pinned = !pinned;
+                fab.classList.toggle('pinned', pinned);
+                return;
+            }
+            alertModal.show();
+        });
+
+        // Allow dragging the FAB to pin position (small UX improvement)
+        (function(){
+            let isDown = false;
+            let startX, startY;
+            fab.addEventListener('mousedown', (ev)=>{ isDown=true; startX=ev.clientX; startY=ev.clientY; });
+            document.addEventListener('mousemove', (ev)=>{
+                if(!isDown) return;
+                const dx = ev.clientX - startX; const dy = ev.clientY - startY;
+                const rect = fab.getBoundingClientRect();
+                fab.style.right = 'auto';
+                fab.style.left = Math.max(8, rect.left + dx) + 'px';
+                fab.style.top = Math.max(8, rect.top + dy) + 'px';
+                startX=ev.clientX; startY=ev.clientY;
+            });
+            document.addEventListener('mouseup', ()=>{ isDown=false; });
+        })();
+    </script>
+</body>
+</html>
+
+    <!-- Modal for messages -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
+            <div id="modal-text" class="text-center text-lg mb-4"></div>
+            <button id="modal-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">OK</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full">
+            <div id="confirm-modal-text" class="text-center text-lg mb-4"></div>
+            <div class="flex justify-end space-x-2">
+                <button id="confirm-cancel-button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition">Cancel</button>
+                <button id="confirm-ok-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Bar -->
+    <div id="notification-bar" class="fixed top-20 right-4 z-50 max-w-sm w-full space-y-2 hidden">
+        <!-- Notifications will be added here dynamically -->
+    </div>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 hidden pt-20">
+        <div class="bg-white rounded-lg p-6 shadow-xl w-full max-w-2xl mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Search Students</h3>
+                <button id="close-search-modal" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <input type="text" id="global-search-input" placeholder="Search by student ID, name, or program..." 
+                   class="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+            <div id="search-results" class="max-h-96 overflow-y-auto">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header class="bg-blue-900 text-white p-6 shadow-md">
+    <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+        <div class="flex items-center space-x-8 w-full">
+            <!-- Logo/Title -->
+            <a href="home.html" class="text-2xl font-bold hover:text-blue-300">University of Zululand Admin Dashboard</a>
+            <!-- Navigation Menu -->
+            <nav class="hidden md:flex space-x-6 ml-8">
+                <a href="unizulu-dashboard-mysql.html" class="hover:underline">Dashboard</a>
+                <a href="student_dashboard.html" class="hover:underline">Students</a>
+                <a href="AdminDashboard.html" class="hover:underline">Lecturers</a>
+                <a href="Dashboard Calculator.html" class="hover:underline">Performance</a>
+                <a href="#" class="hover:underline">Settings</a>
+            </nav>
+        </div>
+        <!-- Admin Info & Actions -->
+        <div class="flex items-center space-x-4 mt-4 sm:mt-0">
+            <!-- Search Button -->
+            <button id="global-search-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span>Search Students</span>
+            </button>
+            
+            <!-- Notifications Button -->
+            <button id="notifications-btn" class="relative bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.24 8.56a5.97 5.97 0 01-4.66-7.3 1 1 0 00-1.14-1.14 5.97 5.97 0 01-7.3 4.66 1 1 0 00-1.14 1.14 5.97 5.97 0 014.66 7.3 1 1 0 001.14 1.14 5.97 5.97 0 017.3-4.66 1 1 0 001.14-1.14z"></path>
+                </svg>
+                <span id="notification-count" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
+            </button>
+
+           <span class="text-sm font-semibold bg-blue-700 px-3 py-1 rounded"><span id="admin-name"></span></span>
+              <span class="text-sm italic"> <span id="admin-role"></span></span>
+            <span id="connection-status" class="font-bold"></span>
+            <button onclick="window.location.href='login.html'" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Logout</button>
+        </div>
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden mt-4 sm:mt-0">
+            <button id="mobile-menu-btn" class="focus:outline-none">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <!-- Mobile Menu Dropdown -->
+    <nav id="mobile-menu" class="md:hidden hidden mt-4">
+        <a href="unizulu-dashboard-mysql.html" class="block py-2 px-4 hover:bg-blue-800">Dashboard</a>
+        <a href="student_dashboard.html" class="block py-2 px-4 hover:bg-blue-800">Students</a>
+        <a href="AdminDashboard.html" class="block py-2 px-4 hover:bg-blue-800">Lecturers</a>
+        <a href="Dashboard Calculator.html" class="block py-2 px-4 hover:bg-blue-800">Performance</a>
+        <a href="#" class="block py-2 px-4 hover:bg-blue-800">Settings</a>
+        <button onclick="window.location.href='login.html'" class="w-full text-left py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded mt-2">Logout</button>
+    </nav>
+    <script>
+        document.getElementById('admin-name').textContent = localStorage.getItem('user_name') || 'Unknown';
+        document.getElementById('admin-role').textContent = localStorage.getItem('user_role') || 'Unknown';
+        document.getElementById('mobile-menu-btn').onclick = function () {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+    };
+    </script>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="container mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Column - Data Management & Risk Assessment -->
+        <div class="lg:col-span-1 space-y-6">
+            
+            <!-- Risk Assessment Section -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-900">Student Risk Assessment</h2>
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 mb-4">
+                    <p class="text-sm text-gray-600 mb-3">
+                        Enter a student number to assess their academic risk.
+                    </p>
+                    <form id="risk-assessment-form" class="space-y-3">
+                        <div>
+                            <label for="risk-student-no" class="block text-sm font-medium text-gray-700">Student Number</label>
+                            <input type="text" id="risk-student-no" placeholder="e.g., 2023624594" required
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition p-2 border"/>
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Check Risk
+                        </button>
+                    </form>
+                </div>
+                <div id="risk-result" class="mt-4 hidden"></div>
+            </div>
+
+            <!-- Add New Records Section -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-900">Add New Records</h2>
+                
+                <!-- Add Student Form -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-4">
+                    <h3 class="font-medium text-blue-900 mb-3">Add Student</h3>
+                    <form id="add-student-form" class="space-y-3">
+                        <input type="text" id="student-id" placeholder="Student ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="student-first-name" placeholder="First Name" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="student-last-name" placeholder="Last Name" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="student-program" placeholder="Program" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Student
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Add Lecturer Form -->
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200 mb-4">
+                    <h3 class="font-medium text-green-900 mb-3">Add Lecturer</h3>
+                    <form id="add-lecturer-form" class="space-y-3">
+                        <input type="text" id="lecturer-id" placeholder="Lecturer ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="lecturer-full-name" placeholder="Full Name" required class="w-full p-2 border rounded-md"/>
+                        <input type="email" id="lecturer-email" placeholder="Email" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="lecturer-password" placeholder="Password" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="lecturer-department" placeholder="Department" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Lecturer
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Add Admin Form -->
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200 mb-4">
+                    <h3 class="font-medium text-purple-900 mb-3">Add Admin</h3>
+                    <form id="add-admin-form" class="space-y-3">
+                        <input type="text" id="admin-id" placeholder="Admin ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="admin-full-name" placeholder="Full Name" required class="w-full p-2 border rounded-md"/>
+                        <input type="email" id="admin-email" placeholder="Email" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="admin-password" placeholder="Password" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="admin-role" placeholder="Role" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Admin
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Add Student Performance Form -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                    <h3 class="font-medium text-gray-900 mb-3">Add Student Performance</h3>
+                    <form id="add-performance-form" class="space-y-3">
+                        <input type="text" id="performance-student-id" placeholder="Student ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="performance-subject-code" placeholder="Subject Code" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="performance-subject-name" placeholder="Subject Name" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="performance-mark" placeholder="Mark" min="0" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="performance-max-mark" placeholder="Max Mark" value="100" required class="w-full p-2 border rounded-md"/>
+                        <select id="performance-assessment-type" class="w-full p-2 border rounded-md">
+                            <option value="Exam">Exam</option>
+                            <option value="Test">Test</option>
+                            <option value="Assignment">Assignment</option>
+                            <option value="Project">Project</option>
+                            <option value="Practical">Practical</option>
+                            <option value="Quiz">Quiz</option>
+                        </select>
+                        <input type="date" id="performance-assessment-date" class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="performance-semester" placeholder="Semester" value="2" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="performance-academic-year" placeholder="Academic Year" value="2024" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="performance-lecturer-id" placeholder="Lecturer ID (optional)" class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Performance Record
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Add Attendance Form -->
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 mb-4">
+                    <h3 class="font-medium text-indigo-900 mb-3">Add Attendance</h3>
+                    <form id="add-attendance-form" class="space-y-3">
+                        <input type="text" id="attendance-student-id" placeholder="Student ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="attendance-percentage" placeholder="Attendance Percentage" min="0" max="100" step="0.1" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Attendance
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Add Assessment Form -->
+                <div class="bg-pink-50 p-4 rounded-lg border border-pink-200 mb-4">
+                    <h3 class="font-medium text-pink-900 mb-3">Add Assessment</h3>
+                    <form id="add-assessment-form" class="space-y-3">
+                        <input type="text" id="assessment-student-id" placeholder="Student ID" required class="w-full p-2 border rounded-md"/>
+                        <select id="assessment-type" class="w-full p-2 border rounded-md">
+                            <option value="Test">Test</option>
+                            <option value="Exam">Exam</option>
+                            <option value="Assignment">Assignment</option>
+                            <option value="Project">Project</option>
+                        </select>
+                        <input type="number" id="assessment-score" placeholder="Score" min="0" step="0.1" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="assessment-max-score" placeholder="Max Score" min="0" step="0.1" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add Assessment
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Add LMS Activity Form -->
+                <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                    <h3 class="font-medium text-teal-900 mb-3">Add LMS Activity</h3>
+                    <form id="add-lms-activity-form" class="space-y-3">
+                        <input type="text" id="lms-student-id" placeholder="Student ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="lms-activity-score" placeholder="LMS Activity Score" min="0" max="100" step="0.1" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Add LMS Activity
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Update Records Section -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-900">Update Existing Records</h2>
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 space-y-4">
+                    <h3 class="font-medium text-yellow-900 mb-3">Update Student Program</h3>
+                    <form id="update-student-form" class="space-y-3">
+                        <input type="text" id="update-student-id" placeholder="Student ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="text" id="update-student-program" placeholder="New Program" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Update Student
+                        </button>
+                    </form>
+
+                    <hr class="border-yellow-200"/>
+
+                    <h3 class="font-medium text-yellow-900 mb-3">Update Performance Record</h3>
+                    <form id="update-performance-form" class="space-y-3">
+                        <input type="number" id="update-performance-id" placeholder="Performance ID" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="update-performance-mark" placeholder="New Mark" required class="w-full p-2 border rounded-md"/>
+                        <input type="number" id="update-performance-max-mark" placeholder="Max Mark" value="100" required class="w-full p-2 border rounded-md"/>
+                        <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Update Performance Record
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Records Section -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-900">Delete Records</h2>
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <p class="text-sm text-gray-600 mb-3">
+                        Delete a record from the database. This action is irreversible.
+                    </p>
+                    <form id="delete-record-form" class="space-y-3">
+                        <div>
+                            <label for="delete-record-type" class="block text-sm font-medium text-gray-700">Record Type</label>
+                            <select id="delete-record-type" class="w-full p-2 border rounded-md">
+                                <option value="student">Student</option>
+                                <option value="lecturer">Lecturer</option>
+                                <option value="admin">Admin</option>
+                                <option value="performance">Performance</option>
+                            </select>
+                        </div>
+                        <input type="text" id="delete-record-id" placeholder="Record ID" required class="w-full p-2 border rounded-md"/>
+                        <div id="delete-performance-container" class="space-y-3 hidden">
+                             <input type="text" id="delete-performance-subject-id" placeholder="Subject Code" class="w-full p-2 border rounded-md"/>
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                            Delete Record
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column - Charts & Records -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="bg-yellow-100 p-4 rounded-xl shadow-md flex items-center justify-center space-x-2 hidden">
+                <svg class="animate-spin h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-yellow-600 font-medium">Loading data...</span>
+            </div>
+            
+            <!-- Charts Card -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-900">Student Performance Visuals</h2>
+                <div class="h-80 w-full mb-6">
+                    <canvas id="bar-chart"></canvas>
+                </div>
+                <div class="h-80 w-full">
+                    <canvas id="line-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Data Records Management Table -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-blue-900">Student Records Management</h2>
+                <div class="mb-4">
+                    <input type="text" id="search-input" placeholder="Search by student number..."
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition p-2 border"/>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student No.</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Data will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center text-gray-500 text-sm p-4 mt-8">
+        &copy; 2023 University of Zululand. All rights reserved.
+    </footer>
+
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+        
+        // References to UI elements
+        const barChartCanvas = document.getElementById('bar-chart');
+        const lineChartCanvas = document.getElementById('line-chart');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const modal = document.getElementById('modal');
+        const modalText = document.getElementById('modal-text');
+        const modalButton = document.getElementById('modal-button');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalText = document.getElementById('confirm-modal-text');
+        const confirmOkButton = document.getElementById('confirm-ok-button');
+        const confirmCancelButton = document.getElementById('confirm-cancel-button');
+        const riskAssessmentForm = document.getElementById('risk-assessment-form');
+        const riskResultDiv = document.getElementById('risk-result');
+        const recordsTableBody = document.getElementById('records-table-body');
+        const searchInput = document.getElementById('search-input');
+        const connectionStatus = document.getElementById('connection-status');
+        
+        // Notification elements
+        const notificationBar = document.getElementById('notification-bar');
+        const notificationsBtn = document.getElementById('notifications-btn');
+        const notificationCount = document.getElementById('notification-count');
+        const searchModal = document.getElementById('search-modal');
+        const globalSearchBtn = document.getElementById('global-search-btn');
+        const closeSearchModal = document.getElementById('close-search-modal');
+        const globalSearchInput = document.getElementById('global-search-input');
+        const searchResults = document.getElementById('search-results');
+
+        // Form elements
+        const addStudentForm = document.getElementById('add-student-form');
+        const addLecturerForm = document.getElementById('add-lecturer-form');
+        const addAdminForm = document.getElementById('add-admin-form');
+        const addPerformanceForm = document.getElementById('add-performance-form');
+        const addAttendanceForm = document.getElementById('add-attendance-form');
+        const addAssessmentForm = document.getElementById('add-assessment-form');
+        const addLmsActivityForm = document.getElementById('add-lms-activity-form');
+        const updateStudentForm = document.getElementById('update-student-form');
+        const updatePerformanceForm = document.getElementById('update-performance-form');
+        const deleteRecordForm = document.getElementById('delete-record-form');
+        const deleteRecordType = document.getElementById('delete-record-type');
+        const deletePerformanceContainer = document.getElementById('delete-performance-container');
+
+        let studentsData = [];
+        let barChart;
+        let lineChart;
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' : 
+                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            
+            notification.className = bgColor + " text-white p-4 rounded-lg shadow-lg flex justify-between items-center transform transition-all duration-300 ease-in-out";
+            notification.innerHTML = `
+                <span class="flex-1">${message}</span>
+                <button class="text-white hover:text-gray-200 ml-4 flex-shrink-0 transition-colors duration-200" 
+                        onclick="this.parentElement.remove(); updateNotificationCount();">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            `;
+            
+            notificationBar.appendChild(notification);
+            notificationBar.classList.remove('hidden');
+            
+            updateNotificationCount();
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                    updateNotificationCount();
+                }
+            }, 5000);
+        }
+
+        function updateNotificationCount() {
+            const count = notificationBar.children.length;
+            if (count > 0) {
+                notificationCount.textContent = count > 99 ? '99+' : count;
+                notificationCount.classList.remove('hidden');
+            } else {
+                notificationCount.classList.add('hidden');
+                notificationBar.classList.add('hidden');
+            }
+        }
+
+        // Clear all notifications function
+        function clearAllNotifications() {
+            while (notificationBar.firstChild) {
+                notificationBar.removeChild(notificationBar.firstChild);
+            }
+            updateNotificationCount();
+        }
+
+        // Fetch and display notifications
+        async function fetchNotifications() {
+            try {
+                const response = await fetch(API_BASE_URL + '/api/notifications');
+                if (response.ok) {
+                    const notifications = await response.json();
+                    // Don't auto-display notifications on fetch to avoid duplication
+                }
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        }
+
+        // Enhanced search functionality
+        globalSearchBtn.addEventListener('click', () => {
+            searchModal.classList.remove('hidden');
+            globalSearchInput.focus();
+        });
+
+        closeSearchModal.addEventListener('click', () => {
+            searchModal.classList.add('hidden');
+        });
+
+        globalSearchInput.addEventListener('input', debounce(async (e) => {
+            const searchTerm = e.target.value.trim();
+            
+            if (searchTerm.length < 2) {
+                searchResults.innerHTML = '<p class="text-gray-500 text-center p-4">Enter at least 2 characters to search</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_BASE_URL + '/api/search/students?q=' + encodeURIComponent(searchTerm));
+                if (response.ok) {
+                    const results = await response.json();
+                    displaySearchResults(results);
+                } else {
+                    searchResults.innerHTML = '<p class="text-red-500 text-center p-4">Error searching students</p>';
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                searchResults.innerHTML = '<p class="text-red-500 text-center p-4">Search failed</p>';
+            }
+        }, 300));
+
+        function displaySearchResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<p class="text-gray-500 text-center p-4">No students found</p>';
+                return;
+            }
+            
+            searchResults.innerHTML = results.map(student => `
+                <div class="border border-gray-200 rounded-lg p-4 mb-2 hover:bg-gray-50 cursor-pointer" 
+                     onclick="selectStudent('${student.student_id}')">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-semibold">${student.first_name} ${student.last_name}</h4>
+                            <p class="text-sm text-gray-600">ID: ${student.student_id} | Program: ${student.program || 'N/A'}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-xs ${
+                            student.risk_level === 'High' ? 'bg-red-100 text-red-800' :
+                            student.risk_level === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                            student.risk_level === 'Low' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }">
+                            ${student.risk_level || 'No Data'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectStudent(studentId) {
+            // Fill the risk assessment form with the selected student
+            document.getElementById('risk-student-no').value = studentId;
+            searchModal.classList.add('hidden');
+            globalSearchInput.value = '';
+            
+            // Optionally trigger risk assessment
+            showNotification('Student ' + studentId + ' selected for risk assessment', 'info');
+        }
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        const showModal = (message) => {
+            modalText.textContent = message;
+            modal.classList.remove('hidden');
+        };
+
+        modalButton.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // Function to show a custom confirmation modal
+        const showConfirmationModal = (message, onConfirmCallback) => {
+            confirmModalText.textContent = message;
+            confirmModal.classList.remove('hidden');
+            
+            // Remove previous listeners to prevent multiple firings
+            confirmOkButton.onclick = null;
+            confirmCancelButton.onclick = null;
+            
+            confirmOkButton.onclick = () => {
+                onConfirmCallback();
+                confirmModal.classList.add('hidden');
+            };
+            
+            confirmCancelButton.onclick = () => {
+                confirmModal.classList.add('hidden');
+            };
+        };
+
+        const updateConnectionStatus = (isOnline) => {
+            if (isOnline) {
+                connectionStatus.textContent = "Backend Connected";
+                connectionStatus.classList.remove('text-red-400');
+                connectionStatus.classList.add('text-green-400');
+            } else {
+                connectionStatus.textContent = "Backend Disconnected";
+                connectionStatus.classList.remove('text-green-400');
+                connectionStatus.classList.add('text-red-400');
+            }
+        };
+
+        // Fetch data from the backend and update the dashboard
+        const fetchAndRenderDashboard = async () => {
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/students');
+                if (!response.ok) {
+                    throw new Error('HTTP error! Status: ' + response.status);
+                }
+                studentsData = await response.json();
+                updateConnectionStatus(true);
+                updateChartsAndTable(studentsData);
+            } catch (error) {
+                console.error("Failed to fetch student data:", error);
+                showNotification("Could not connect to the backend server. Please ensure it is running and accessible.", 'error');
+                updateConnectionStatus(false);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        };
+
+        // Function to update the charts and table with new data
+        const updateChartsAndTable = (data) => {
+            // Ensure all risk levels are present in the counts object
+            const riskLevelCounts = { "Low": 0, "Medium": 0, "High": 0, "Very High": 0, "N/A": 0 };
+            const studentIds = [];
+            const riskScores = [];
+
+            data.forEach(item => {
+                // Normalize risk level string (handle possible case/typo issues)
+                let riskLevel = (item.risk_level || "N/A").trim();
+                if (riskLevel.toLowerCase() === "very high") riskLevel = "Very High";
+                if (riskLevel.toLowerCase() === "high") riskLevel = "High";
+                if (riskLevel.toLowerCase() === "medium") riskLevel = "Medium";
+                if (riskLevel.toLowerCase() === "low") riskLevel = "Low";
+                if (!riskLevelCounts.hasOwnProperty(riskLevel)) riskLevel = "N/A";
+                riskLevelCounts[riskLevel] += 1;
+                studentIds.push(item.student_id);
+
+                // Map risk levels to numeric values for the line chart
+                switch (riskLevel) {
+                    case "Low": riskScores.push(1); break;
+                    case "Medium": riskScores.push(2); break;
+                    case "High": riskScores.push(3); break;
+                    case "Very High": riskScores.push(4); break;
+                    default: riskScores.push(0);
+                }
+            });
+
+            if (barChart) {
+                barChart.destroy();
+            }
+            barChart = new Chart(barChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(riskLevelCounts),
+                    datasets: [{
+                        label: 'Number of Students by Risk Level',
+                        data: Object.values(riskLevelCounts),
+                        backgroundColor: [
+                            'rgba(52, 211, 153, 0.7)',    // Low
+                            'rgba(251, 191, 36, 0.7)',    // Medium
+                            'rgba(239, 68, 68, 0.7)',     // High
+                            'rgba(139, 0, 0, 0.7)',       // Very High
+                            'rgba(156, 163, 175, 0.7)'    // N/A
+                        ],
+                        borderColor: [
+                            'rgb(52, 211, 153)',
+                            'rgb(251, 191, 36)',
+                            'rgb(239, 68, 68)',
+                            'rgb(139, 0, 0)',
+                            'rgb(156, 163, 175)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Student Risk Level Distribution' }
+                    }
+                }
+            });
+
+            if (lineChart) {
+                lineChart.destroy();
+            }
+            lineChart = new Chart(lineChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: studentIds.slice(0, 20), // Limit to first 20 for readability
+                    datasets: [{
+                        label: 'Risk Level by Student ID',
+                        data: riskScores.slice(0, 20),
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        fill: true,
+                        tension: 0.1,
+                        pointBackgroundColor: riskScores.slice(0, 20).map(score => {
+                            if (score === 4) return 'rgba(139,0,0,1)';      // Very High
+                            if (score === 3) return 'rgba(239,68,68,1)';    // High
+                            if (score === 2) return 'rgba(251,191,36,1)';   // Medium
+                            if (score === 1) return 'rgba(52,211,153,1)';   // Low
+                            return 'rgba(156,163,175,1)';                   // N/A
+                        })
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 4,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    if (value === 1) return 'Low';
+                                    if (value === 2) return 'Medium';
+                                    if (value === 3) return 'High';
+                                    if (value === 4) return 'Very High';
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            populateTable(data);
+        };
+        
+        // Populate the data records table
+        const populateTable = (data) => {
+            recordsTableBody.innerHTML = '';
+            const filteredData = data.filter(record => 
+                record.student_id.toString().includes(searchInput.value) ||
+                (record.first_name && record.first_name.toLowerCase().includes(searchInput.value.toLowerCase())) ||
+                (record.last_name && record.last_name.toLowerCase().includes(searchInput.value.toLowerCase()))
+            );
+
+            filteredData.forEach(record => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                const riskLevelClass = record.risk_level === 'High' || record.risk_level === 'Very High' ? 'text-red-600 font-bold' : 
+                                      record.risk_level === 'Medium' ? 'text-yellow-600 font-bold' : 
+                                      record.risk_level === 'Low' ? 'text-green-600 font-bold' : 'text-gray-500';
+                row.innerHTML = `
+                    <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${record.student_id}</td>
+                    <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">${record.first_name || 'N/A'}</td>
+                    <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">${record.last_name || 'N/A'}</td>
+                    <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">${record.program || 'N/A'}</td>
+                    <td class="px-6 py-3 whitespace-nowrap text-sm ${riskLevelClass}">${record.risk_level || 'N/A'}</td>
+                `;
+                recordsTableBody.appendChild(row);
+            });
+        };
+        
+        // Handle risk assessment - FIXED ENDPOINT
+        riskAssessmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const studentNo = document.getElementById('risk-student-no').value;
+            if (!studentNo) {
+                showNotification("Please enter a valid student number.", 'error');
+                return;
+            }
+            
+            loadingIndicator.classList.remove('hidden');
+            riskResultDiv.classList.add('hidden');
+            
+            try {
+                // FIXED: Using the correct endpoint
+                const response = await fetch(API_BASE_URL + '/api/calculate_risk/' + studentNo);
+                
+                if (!response.ok) {
+                    let errorMessage = "Failed to fetch risk data.";
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = response.statusText || errorMessage;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                const result = await response.json();
+                
+                // Check if we got a valid response
+                if (!result.risk_level) {
+                    throw new Error("Invalid response from server");
+                }
+                
+                const riskLevel = result.risk_level;
+                const recommendation = result.recommendation;
+                const averagePercentage = result.average_percentage || 0;
+                
+                let riskColor = 'text-gray-600';
+                let riskBgColor = 'bg-gray-100';
+                if (riskLevel === 'Very High') {
+                    riskColor = 'text-red-800';
+                    riskBgColor = 'bg-red-100 border border-red-300';
+                } else if (riskLevel === 'High') {
+                    riskColor = 'text-red-600';
+                    riskBgColor = 'bg-red-50 border border-red-200';
+                } else if (riskLevel === 'Medium') {
+                    riskColor = 'text-yellow-600';
+                    riskBgColor = 'bg-yellow-50 border border-yellow-200';
+                } else if (riskLevel === 'Low') {
+                    riskColor = 'text-green-600';
+                    riskBgColor = 'bg-green-50 border border-green-200';
+                }
+                
+                riskResultDiv.innerHTML = `
+                    <div class="${riskBgColor} p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-sm font-medium">Student: <span class="font-bold">${result.first_name} ${result.last_name}</span></p>
+                                <p class="text-sm font-medium">Student ID: <span class="font-bold">${result.student_id}</span></p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-sm font-bold ${riskColor}">
+                                ${riskLevel}
+                            </span>
+                        </div>
+                        <p class="text-sm mb-2">Average Performance: <span class="font-bold">${averagePercentage}%</span></p>
+                        <div class="mt-3 p-3 bg-white rounded-md border">
+                            <h4 class="text-sm font-semibold mb-2 text-blue-900">Recommendation:</h4>
+                            <p class="text-sm text-gray-700 whitespace-pre-line">${recommendation}</p>
+                        </div>
+                        ${result.performance_data && result.performance_data.length > 0 ? `
+                        <div class="mt-3">
+                            <h4 class="text-sm font-semibold mb-2 text-blue-900">Performance Details:</h4>
+                            <div class="text-xs space-y-1 max-h-40 overflow-y-auto">
+                                ${result.performance_data.map(perf => `
+                                    <div class="flex justify-between border-b border-gray-100 py-1">
+                                        <span class="font-medium">${perf.subject_name} (${perf.subject_code})</span>
+                                        <span>${perf.mark}/${perf.max_mark} (${((perf.mark/perf.max_mark)*100).toFixed(1)}%) - Grade: ${perf.grade}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                showNotification('Risk assessment completed for student ' + studentNo, 'success');
+
+            } catch (error) {
+                console.error("Error performing risk assessment:", error);
+                riskResultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                        <p class="text-sm text-red-600 font-semibold">Error: ${error.message}</p>
+                        <p class="text-xs text-red-500 mt-2">Please check if the student exists and has performance records.</p>
+                    </div>
+                `;
+                showNotification('Risk assessment failed: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                riskResultDiv.classList.remove('hidden');
+            }
+        });
+        
+        // Handle search input for the table
+        searchInput.addEventListener('input', () => {
+            populateTable(studentsData);
+        });
+
+        // Handle Add Student form submission
+        addStudentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const studentData = {
+                student_id: document.getElementById('student-id').value,
+                first_name: document.getElementById('student-first-name').value,
+                last_name: document.getElementById('student-last-name').value,
+                program: document.getElementById('student-program').value,
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                const response = await fetch(API_BASE_URL + '/api/add_student', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(studentData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addStudentForm.reset();
+                    fetchAndRenderDashboard();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding student:", error);
+                showNotification('Failed to add student: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Add Lecturer form submission
+        addLecturerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lecturerData = {
+                lecturer_id: document.getElementById('lecturer-id').value,
+                full_name: document.getElementById('lecturer-full-name').value,
+                email: document.getElementById('lecturer-email').value,
+                password: document.getElementById('lecturer-password').value,
+                department: document.getElementById('lecturer-department').value,
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/add_lecturer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lecturerData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addLecturerForm.reset();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding lecturer:", error);
+                showNotification('Failed to add lecturer: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Add Admin form submission
+        addAdminForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const adminData = {
+                admin_id: document.getElementById('admin-id').value,
+                full_name: document.getElementById('admin-full-name').value,
+                email: document.getElementById('admin-email').value,
+                password: document.getElementById('admin-password').value,
+                role: document.getElementById('admin-role').value,
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/add_admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(adminData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addAdminForm.reset();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding admin:", error);
+                showNotification('Failed to add admin: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Add Performance form submission
+        addPerformanceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const performanceData = {
+                student_id: document.getElementById('performance-student-id').value,
+                subject_code: document.getElementById('performance-subject-code').value,
+                subject_name: document.getElementById('performance-subject-name').value,
+                mark: parseFloat(document.getElementById('performance-mark').value),
+                max_mark: parseFloat(document.getElementById('performance-max-mark').value),
+                assessment_type: document.getElementById('performance-assessment-type').value,
+                assessment_date: document.getElementById('performance-assessment-date').value || new Date().toISOString().split('T')[0],
+                semester: document.getElementById('performance-semester').value,
+                academic_year: parseInt(document.getElementById('performance-academic-year').value),
+                lecturer_id: document.getElementById('performance-lecturer-id').value || null
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/performance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(performanceData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addPerformanceForm.reset();
+                    fetchAndRenderDashboard();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding performance record:", error);
+                showNotification('Failed to add performance record: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Add Attendance form submission
+        addAttendanceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const attendanceData = {
+                student_id: document.getElementById('attendance-student-id').value,
+                attendance_percentage: parseFloat(document.getElementById('attendance-percentage').value)
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/attendance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(attendanceData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addAttendanceForm.reset();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding attendance:", error);
+                showNotification('Failed to add attendance: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Add Assessment form submission
+        addAssessmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const assessmentData = {
+                student_id: document.getElementById('assessment-student-id').value,
+                assessment_type: document.getElementById('assessment-type').value,
+                score: parseFloat(document.getElementById('assessment-score').value),
+                max_score: parseFloat(document.getElementById('assessment-max-score').value)
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/assessments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(assessmentData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addAssessmentForm.reset();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding assessment:", error);
+                showNotification('Failed to add assessment: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Add LMS Activity form submission
+        addLmsActivityForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lmsData = {
+                student_id: document.getElementById('lms-student-id').value,
+                lms_activity_score: parseFloat(document.getElementById('lms-activity-score').value)
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/lms_activity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lmsData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    addLmsActivityForm.reset();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error adding LMS activity:", error);
+                showNotification('Failed to add LMS activity: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Update Student form submission
+        updateStudentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const studentId = document.getElementById('update-student-id').value;
+            const updatedData = {
+                program: document.getElementById('update-student-program').value,
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                const response = await fetch(API_BASE_URL + '/api/students/update_program/' + studentId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    updateStudentForm.reset();
+                    fetchAndRenderDashboard();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error updating student:", error);
+                showNotification('Failed to update student: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Handle Update Performance form submission
+        updatePerformanceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const performanceId = document.getElementById('update-performance-id').value;
+            const updatedData = {
+                mark: parseFloat(document.getElementById('update-performance-mark').value),
+                max_mark: parseFloat(document.getElementById('update-performance-max-mark').value),
+            };
+            
+            loadingIndicator.classList.remove('hidden');
+            try {
+                const response = await fetch(API_BASE_URL + '/api/performance/' + performanceId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(result.message, 'success');
+                    updatePerformanceForm.reset();
+                    fetchAndRenderDashboard();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error("Error updating performance record:", error);
+                showNotification('Failed to update performance record: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Toggle the performance subject field visibility based on selection
+        deleteRecordType.addEventListener('change', (e) => {
+            if (e.target.value === 'performance') {
+                deletePerformanceContainer.classList.remove('hidden');
+            } else {
+                deletePerformanceContainer.classList.add('hidden');
+            }
+        });
+
+        // Handle Delete Record form submission
+        deleteRecordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const recordType = document.getElementById('delete-record-type').value;
+            const recordId = document.getElementById('delete-record-id').value;
+            const subjectId = document.getElementById('delete-performance-subject-id').value;
+            let message = 'Are you sure you want to delete this ' + recordType + ' with ID ' + recordId + '? This action cannot be undone.';
+            
+            if (recordType === 'performance') {
+                message = 'Are you sure you want to delete the performance record for Student ID ' + recordId + ' in Subject ' + subjectId + '? This action cannot be undone.';
+            }
+
+            showConfirmationModal(message, async () => {
+                loadingIndicator.classList.remove('hidden');
+                
+                try {
+                    let url = API_BASE_URL + '/api/delete_' + recordType + '/' + recordId;
+                    if (recordType === 'performance') {
+                        url += '/' + subjectId;
+                    }
+
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showNotification(result.message, 'success');
+                        deleteRecordForm.reset();
+                        fetchAndRenderDashboard();
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error("Error deleting record:", error);
+                    showNotification('Failed to delete record: ' + error.message, 'error');
+                } finally {
+                    loadingIndicator.classList.add('hidden');
+                }
+            });
+        });
+
+        // Add clear all button to notifications
+        notificationsBtn.addEventListener('click', () => {
+            if (notificationBar.children.length > 0) {
+                showConfirmationModal(
+                    'Are you sure you want to clear all notifications?',
+                    clearAllNotifications
+                );
+            } else {
+                showNotification('No notifications to clear', 'info');
+            }
+        });
+
+        // Initial setup on window load
+        // window.onload = function()  // Remove this stray line
+
+        // Initial setup on window load
+        window.onload = function() {
+            fetchAndRenderDashboard();
+            fetchNotifications();
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome to University of Zululand Admin Dashboard', 'info');
+            }, 1000);
+            
+            // Load notifications every 30 seconds
+            setInterval(fetchNotifications, 30000);
+        };
+    </script>
+
+</body>
+</html>

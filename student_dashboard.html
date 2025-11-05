@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | University of Zululand</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #ffd700;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --light-text-color: #777777;
+            --border-color: #e0e0e0;
+            --shadow-light: 0 4px 15px rgba(0, 51, 102, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 51, 102, 0.12);
+            --low-risk: #28a745;
+            --medium-risk: #ffc107;
+            --high-risk: #dc3545;
+            --very-high-risk: #8b0000;
+            --no-data: #6c757d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .navbar nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar nav a,
+        .navbar nav .dropdown-btn {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            background: none;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .navbar nav a:hover,
+        .navbar nav .dropdown-btn:hover {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .navbar .date-time {
+            font-size: 0.95em;
+            margin-left: 16px;
+            font-weight: 400;
+            opacity: 0.85;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: var(--card-background);
+            min-width: 200px;
+            box-shadow: var(--shadow-light);
+            border-radius: 8px;
+            z-index: 100;
+            top: 110%;
+            left: 0;
+            padding: 8px 0;
+        }
+
+        .dropdown-content a {
+            color: var(--primary-color);
+            padding: 10px 18px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1em;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background: #f3f3f3;
+            color: var(--primary-color);
+        }
+
+        .dropdown-content a i {
+            color: var(--primary-color);
+            font-size: 1em;
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown:focus-within .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: var(--card-background);
+            padding: 32px;
+            box-shadow: var(--shadow-light);
+            border-radius: 16px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-section h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.1em;
+        }
+
+        .user-info span {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .user-info a {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .user-info a:hover {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .dashboard-main {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary-color), #004080);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .welcome-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-section p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 10px;
+        }
+
+        .data-section {
+            background: #fdfdfd;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .data-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-section h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.45em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .data-section h3 i {
+            color: var(--secondary-color);
+        }
+
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .risk-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-low { background: var(--low-risk); color: white; }
+        .risk-medium { background: var(--medium-risk); color: black; }
+        .risk-high { background: var(--high-risk); color: white; }
+        .risk-very-high { background: var(--very-high-risk); color: white; }
+        .risk-no-data { background: var(--no-data); color: white; }
+
+        .risk-score {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: var(--light-text-color);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .performance-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .performance-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .performance-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .performance-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .grade {
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .grade-A { background: #d4edda; color: #155724; }
+        .grade-B { background: #fff3cd; color: #856404; }
+        .grade-C { background: #ffeaa7; color: #856404; }
+        .grade-D { background: #f8d7da; color: #721c24; }
+        .grade-F { background: #f5c6cb; color: #721c24; }
+
+        .percentage-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .percentage-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--light-text-color);
+        }
+
+        .loading i {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 20px;
+            }
+
+            .navbar nav {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .navbar .date-time {
+                display: none;
+            }
+
+            .container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-table {
+                font-size: 0.9em;
+            }
+
+            .performance-table th,
+            .performance-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <nav>
+            <a href="Home.html">Home</a>
+            <a href="#">Profile</a>
+            <a href="#">Support</a>
+            <a href="#">Resources</a>
+            <div class="dropdown">
+                <button class="dropdown-btn"><i class="fa-solid fa-book-open"></i> Learning Resource <i class="fa-solid fa-caret-down"></i></button>
+                <div class="dropdown-content">
+                    <a href="https://library.unizulu.ac.za/" target="_blank"><i class="fa-solid fa-building-columns"></i> University of Zululand Library</a>
+                    <a href="https://library.unizulu.ac.za/eresources/" target="_blank"><i class="fa-solid fa-globe"></i> Library E-Resources</a>
+                    <a href="https://libguides.unizulu.ac.za/" target="_blank"><i class="fa-solid fa-book"></i> LibGuides</a>
+                    <a href="https://ienablerprod.unizulu.ac.za/pls/prodi41/w99pkg.mi_login" target="_blank"><i class="fa-solid fa-user-gear"></i> ITS iEnabler</a>
+                    <a href="https://www.unizulu.ac.za/class-timetable/" target="_blank"><i class="fa-solid fa-calendar-days"></i> Class Time Table</a>
+                    <a href="https://outlook.office.com/mail/" target="_blank"><i class="fa-solid fa-envelope"></i> Email</a>
+                </div>
+            </div>
+        </nav>
+        <span class="date-time" id="dateTime"></span>
+    </div>
+    <div class="container">
+        <div class="header-section">
+            <h1 id="dashboard-title">Student Dashboard</h1>
+            <div class="user-info">
+                <span id="userName"></span>
+                <a href="Login.html" id="logoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+        <div class="dashboard-main">
+            <div class="welcome-section" id="welcomeSection">
+                <h2><i class="fa-solid fa-graduation-cap"></i> Welcome back!</h2>
+                <p>Your academic performance and risk assessment are shown below</p>
+            </div>
+            
+            <div class="dashboard-content">
+                <div class="data-section" id="risk-data">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i> Risk Assessment</h3>
+                    <div class="loading" id="riskLoading">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p>Loading risk assessment...</p>
+                    </div>
+                    <div id="riskContent" style="display: none;">
+                        <div class="risk-indicator">
+                            <div class="risk-badge" id="riskBadge">Loading</div>
+                            <div class="risk-score" id="riskScore">0%</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Recommendation</div>
+                            <div class="info-value" id="recommendation">Loading recommendation...</div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Average Percentage</div>
+                                <div class="info-value" id="averagePercentage">0%</div>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" id="percentageFill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Performance Records</div>
+                                <div class="info-value" id="performanceCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section" id="academic-data">
+                    <h3><i class="fa-solid fa-chart-line"></i> Academic Overview</h3>
+                    <div class="loading" id="academicLoading">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p>Loading academic data...</p>
+                    </div>
+                    <div id="academicContent" style="display: none;">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Student ID</div>
+                                <div class="info-value" id="studentId">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Program</div>
+                                <div class="info-value" id="studentProgram">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Attendance Rate</div>
+                                <div class="info-value" id="attendanceRate">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">LMS Activity</div>
+                                <div class="info-value" id="lmsActivity">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section" id="performance-data">
+                <h3><i class="fa-solid fa-table"></i> Performance Records</h3>
+                <div class="loading" id="performanceLoading">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <p>Loading performance records...</p>
+                </div>
+                <div id="performanceContent" style="display: none;">
+                    <table class="performance-table">
+                        <thead>
+                            <tr>
+                                <th>Subject Code</th>
+                                <th>Subject Name</th>
+                                <th>Mark</th>
+                                <th>Max Mark</th>
+                                <th>Percentage</th>
+                                <th>Grade</th>
+                                <th>Assessment Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performanceTableBody">
+                            <!-- Performance data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Date and time updater
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+            const dateStr = now.toLocaleDateString(undefined, options);
+            const timeStr = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('dateTime').textContent = `${dateStr} | ${timeStr}`;
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userNameEl = document.getElementById('userName');
+            const welcomeSection = document.getElementById('welcomeSection');
+            const riskContent = document.getElementById('riskContent');
+            const academicContent = document.getElementById('academicContent');
+            const performanceContent = document.getElementById('performanceContent');
+            const riskLoading = document.getElementById('riskLoading');
+            const academicLoading = document.getElementById('academicLoading');
+            const performanceLoading = document.getElementById('performanceLoading');
+
+            // Get user info from localStorage
+            const userData = JSON.parse(localStorage.getItem('user_data'));
+            
+            if (!userData || userData.role !== 'student') {
+                alert('Please log in as a student to access this dashboard.');
+                window.location.href = 'Login.html';
+                return;
+            }
+
+            const studentId = userData.user_id;
+            const firstName = userData.first_name;
+            const fullName = (firstName + ' ' + (userData.last_name || '')).trim();
+
+            // Update UI with user info
+            userNameEl.textContent = `Welcome, ${firstName}`;
+            welcomeSection.querySelector('h2').innerHTML = `<i class="fa-solid fa-graduation-cap"></i> Welcome back, ${firstName}!`;
+
+            // Handle logout
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.clear();
+                window.location.href = 'Login.html';
+            });
+
+            // Add this function to update student activity
+            async function updateStudentActivity(studentId) {
+                try {
+                    // Update last login time
+                    await fetch(`http://127.0.0.1:5000/api/update_student_login/${studentId}`, {
+                        method: 'POST'
+                    });
+                    
+                    // Update last risk check time (we'll call this when risk data is loaded)
+                    await fetch(`http://127.0.0.1:5000/api/update_risk_check/${studentId}`, {
+                        method: 'POST'
+                    });
+                    
+                    console.log('Student activity updated successfully');
+                } catch (error) {
+                    console.error('Error updating student activity:', error);
+                }
+            }
+
+            // Modify the fetchStudentData function to include activity tracking
+            // filepath: c:\Users\Sandile\Documents\Final Year Project\Final Year Project\student_dashboard.html
+            const fetchStudentData = async () => {
+                try {
+                    await updateStudentActivity(studentId);
+
+                    const riskResponse = await fetch(`http://127.0.0.1:5000/api/calculate_risk/${studentId}`);
+                    const riskData = await riskResponse.json();
+                    console.log('riskData:', riskData); // <-- Add this
+
+                    if (riskData.error) {
+                        throw new Error(riskData.error);
+                    }
+
+                    const performanceResponse = await fetch(`http://127.0.0.1:5000/api/performance/student/${studentId}`);
+                    let performanceData = [];
+                    if (performanceResponse.ok) {
+                        performanceData = await performanceResponse.json();
+                    }
+                    console.log('performanceData:', performanceData); // <-- Add this
+
+                    const studentsResponse = await fetch('http://127.0.0.1:5000/api/students');
+                    let studentOverview = null;
+                    if (studentsResponse.ok) {
+                        const allStudentsData = await studentsResponse.json();
+                        console.log('allStudentsData:', allStudentsData); // <-- Add this
+                        studentOverview = allStudentsData.find(s => s.student_id == studentId);
+                    }
+
+                    // await fetchNotifications(studentId); // Removed undefined function call
+
+                    updateRiskAssessment(riskData);
+                    updateAcademicOverview(studentOverview, riskData);
+                    updatePerformanceTable(performanceData);
+
+                    riskLoading.style.display = 'none';
+                    academicLoading.style.display = 'none';
+                    performanceLoading.style.display = 'none';
+                    riskContent.style.display = 'block';
+                    academicContent.style.display = 'block';
+                    performanceContent.style.display = 'block';
+
+                } catch (error) {
+                    console.error(error);
+                    showError("Error loading student data. Please check if the backend server is running on http://127.0.0.1:5000");
+                }
+            };
+
+            // Update risk assessment section
+            function updateRiskAssessment(data) {
+                const riskBadge = document.getElementById('riskBadge');
+                const riskScore = document.getElementById('riskScore');
+                const recommendation = document.getElementById('recommendation');
+                const averagePercentage = document.getElementById('averagePercentage');
+                const percentageFill = document.getElementById('percentageFill');
+                const performanceCount = document.getElementById('performanceCount');
+
+                // Handle case where risk data might not be available
+                if (data.error) {
+                    // Only show error if it's a real error, not just "No Data"
+                    if (data.error === "Student not found.") {
+                        throw new Error(data.error);
+                    } else {
+                        // Show "No Data" in the UI, not as an error
+                        data = { risk_level: "No Data" };
+                    }
+                }
+
+                // Set risk level with appropriate styling
+                const riskLevel = data.risk_level || 'No Data';
+                riskBadge.textContent = riskLevel;
+                riskBadge.className = 'risk-badge ';
+                
+                if (riskLevel.includes('Low')) {
+                    riskBadge.classList.add('risk-low');
+                } else if (riskLevel.includes('Medium')) {
+                    riskBadge.classList.add('risk-medium');
+                } else if (riskLevel.includes('High')) {
+                    riskBadge.classList.add('risk-high');
+                } else if (riskLevel.includes('Very High')) {
+                    riskBadge.classList.add('risk-very-high');
+                } else {
+                    riskBadge.classList.add('risk-no-data');
+                }
+
+                // Set risk score and average percentage
+                const avgPercent = data.average_percentage || data.risk_score || 0;
+                riskScore.textContent = `${avgPercent}%`;
+                averagePercentage.textContent = `${avgPercent}%`;
+                percentageFill.style.width = `${avgPercent}%`;
+
+                // Set recommendation and performance count
+                recommendation.textContent = data.recommendation || 'No recommendation available.';
+                performanceCount.textContent = data.performance_count || data.performance_data?.length || 0;
+            }
+
+            // Update academic overview section
+            function updateAcademicOverview(overviewData, riskData) {
+                document.getElementById('studentId').textContent = overviewData?.student_id || riskData.student_id;
+                document.getElementById('studentProgram').textContent = overviewData?.program || 'Not specified';
+                
+                // Handle attendance data - your backend might have different field names
+                const attendance = overviewData?.attendance_rate || overviewData?.attendance_percentage;
+                document.getElementById('attendanceRate').textContent = attendance ? `${attendance}%` : 'N/A';
+                
+                // Handle LMS activity data
+                const lmsActivity = overviewData?.lms_activity || overviewData?.lms_activity_score;
+                document.getElementById('lmsActivity').textContent = lmsActivity ? `${lmsActivity}%` : 'N/A';
+            }
+
+            // Update performance table
+            function updatePerformanceTable(performanceData) {
+                const tableBody = document.getElementById('performanceTableBody');
+                
+                if (!performanceData || performanceData.length === 0 || performanceData.error) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px; color: var(--light-text-color);">
+                                <i class="fa-solid fa-inbox" style="font-size: 2em; margin-bottom: 10px; display: block;"></i>
+                                No performance records found.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tableBody.innerHTML = performanceData.map(record => {
+                    const percentage = record.percentage || ((record.mark / record.max_mark) * 100).toFixed(1);
+                    const gradeClass = `grade-${record.grade}`;
+                    
+                    return `
+                        <tr>
+                            <td>${record.subject_code}</td>
+                            <td>${record.subject_name}</td>
+                            <td>${record.mark}</td>
+                            <td>${record.max_mark}</td>
+                            <td>${percentage}%</td>
+                            <td><span class="grade ${gradeClass}">${record.grade}</span></td>
+                            <td>${record.assessment_type}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Show error message
+            function showError(message) {
+                riskLoading.innerHTML = `<div class="error-message"><i class="fa-solid fa-exclamation-triangle"></i> ${message}</div>`;
+                academicLoading.style.display = 'none';
+                performanceLoading.style.display = 'none';
+            }
+
+            // Initialize dashboard
+            fetchStudentData();
+        });
+    </script>
+</body>
+</html>

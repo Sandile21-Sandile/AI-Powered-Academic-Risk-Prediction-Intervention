@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - AI Academic Risk Prediction</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+        .nav {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+            background: rgba(30,60,114,0.95);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; height: 80px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .nav-logo p {
+            color: #fff; font-size: 2rem; font-weight: 700; letter-spacing: 1px;
+        }
+        .nav-menu ul {
+            display: flex; gap: 30px;
+        }
+        .nav-menu ul li {
+            list-style: none;
+        }
+        .nav-menu ul li .link {
+            color: #fff; text-decoration: none; font-weight: 500; font-size: 1.1rem;
+            padding: 8px 0; transition: border 0.2s;
+        }
+        .link:hover, .action {
+            border-bottom: 2px solid #fff;
+        }
+        .nav-button .btn {
+            background: #fff; color: #1e3c72;
+            padding: 8px 24px; border: none; border-radius: 25px;
+            font-weight: 600; margin-left: 15px; cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-button .btn:hover {
+            background: #2a5298; color: #fff;
+        }
+        .nav-menu-btn {
+            display: none;
+        }
+        .hero {
+            margin-top: 100px;
+            text-align: center;
+            color: #fff;
+            padding: 60px 20px 30px 20px;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            color: #e0e0e0;
+        }
+        .cta-btn {
+            background: #ffb347;
+            color: #1e3c72;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(30,60,114,0.15);
+            transition: background 0.2s, color 0.2s;
+        }
+        .cta-btn:hover {
+            background: #fff;
+            color: #2a5298;
+        }
+        .services-section {
+            max-width: 1100px;
+            margin: 40px auto 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .service-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(30,60,114,0.10);
+            padding: 32px 28px;
+            width: 320px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .service-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(30,60,114,0.18);
+        }
+        .service-card i {
+            font-size: 2.5rem;
+            color: #2a5298;
+            margin-bottom: 18px;
+        }
+        .service-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1e3c72;
+        }
+        .service-card p {
+            color: #444;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .testimonial-section {
+            background: rgba(255,255,255,0.12);
+            padding: 40px 0;
+            margin-top: 40px;
+        }
+        .testimonial-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .testimonial {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 12px rgba(30,60,114,0.10);
+            padding: 24px 20px;
+            width: 270px;
+            text-align: left;
+            position: relative;
+        }
+        .testimonial:before {
+            content: "“";
+            font-size: 2.5rem;
+            color: #2a5298;
+            position: absolute;
+            left: 15px; top: 10px;
+        }
+        .testimonial p {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 18px;
+        }
+        .testimonial .user {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 1.05rem;
+        }
+        .testimonial .role {
+            font-size: 0.95rem;
+            color: #888;
+        }
+        footer {
+            background: #1e3c72;
+            color: #fff;
+            text-align: center;
+            padding: 18px 0;
+            margin-top: 50px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        @media (max-width: 900px) {
+            .services-section, .testimonial-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .service-card, .testimonial {
+                width: 90%;
+            }
+        }
+        @media (max-width: 700px) {
+            .nav { flex-direction: column; height: auto; padding: 10px 10px; }
+            .nav-menu ul { flex-direction: column; gap: 10px; }
+            .nav-button { margin-top: 10px; }
+            .hero h1 { font-size: 2rem; }
+            .services-section { gap: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-logo">
+            <p><i class="fas fa-graduation-cap"></i> Student Risk Prediction</p>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <ul>
+                <li><a href="Login.html" class="link">Home</a></li>
+                <li><a href="#" class="link">Blog</a></li>
+                <li><a href="Service.html" class="link action">Service</a></li>
+                <li><a href="About.html" class="link">About</a></li>
+            </ul>
+        </div>
+        <div class="nav-button">
+            <button class="btn" onclick="window.location.href='Login.html'">Log In</button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Empowering Success at University of Zululand</h1>
+        <p>
+            Unlock your academic potential with our AI-powered risk prediction platform.<br>
+            Designed for <b>students</b>, <b>lecturers</b>, and <b>staff</b> to thrive together!
+        </p>
+        <button class="cta-btn" onclick="window.location.href='Login.html'">
+            Get Started Now
+        </button>
+    </section>
+
+    <section class="services-section">
+        <div class="service-card">
+            <i class="fas fa-chart-line"></i>
+            <h3>AI Risk Prediction</h3>
+            <p>
+                Advanced algorithms analyze your academic data to predict risks and provide actionable insights for improvement.
+            </p>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-database"></i>
+            <h3>Student Database</h3>
+            <p>
+                Securely manage and update student records, attendance, and progress reports in one centralized platform.
+            </p>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-bell"></i>
+            <h3>Early Intervention</h3>
+            <p>
+                Lecturers and staff receive timely alerts to support at-risk students before challenges escalate.
+            </p>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-lightbulb"></i>
+            <h3>Data-Driven Insights</h3>
+            <p>
+                Generate detailed analytics and reports to help management make informed, impactful academic decisions.
+            </p>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-users"></i>
+            <h3>Community Support</h3>
+            <p>
+                Connect with mentors, peers, and support staff for guidance, motivation, and academic resources.
+            </p>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Mobile Friendly</h3>
+            <p>
+                Access all features on any device, anytime, anywhere—stay connected to your academic journey!
+            </p>
+        </div>
+    </section>
+
+    <section class="testimonial-section">
+        <h2 style="text-align:center; color:#1e3c72; margin-bottom:30px;">Findings From Researcher</h2>
+        <div class="testimonial-container">
+            <div class="testimonial">
+                <p>
+                    "Sometimes I only realize I am struggling when exams are close. An early warning system would help me prepare earlier"
+                </p>
+                <div class="user">N Dlamini</div>
+                <div class="role">2nd Year Student</div>
+            </div>
+            <div class="testimonial">
+                <p>
+                    This platform could save many students from failing by providing timely support and tracking struggling students. The platform should be linked to our current LMS, like moodle because that is where we spend most of our time and the is no system that tracks students performance.
+                </p>
+                <div class="user">Mr S Zwane</div>
+                <div class="role">Lecturer, Computer Science</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2025 University of Zululand | AI Risk Detection System
+    </footer>
+</body>
+</html>

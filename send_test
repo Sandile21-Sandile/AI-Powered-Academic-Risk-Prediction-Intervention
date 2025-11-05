@@ -1,0 +1,17 @@
+from app import send_risk_alert
+# Make sure there is a file named 'app.py' in the same directory as this script, and that it defines 'send_risk_alert'
+
+def main():
+    sample = {
+        'studentName': 'Test Student',
+        'studentEmail': 'teststudent@example.com',
+        'riskLevel': 'High',
+        'alertMessage': 'This is a test alert from automated test script.',
+        'recommendations': 'Contact student and follow up.'
+    }
+
+    ok = send_risk_alert(sample)
+    print('send_risk_alert returned:', ok)
+
+if __name__ == '__main__':
+    main()

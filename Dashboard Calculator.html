@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecturer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .container { max-width: 1200px; }
+        .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 2rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background-color: white; margin: 5% auto; padding: 2rem; border-radius: 12px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-start justify-center p-8">
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full bg-gray-800 text-white shadow-lg z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="text-2xl font-bold">Lecturer Dashboard</div>
+            <div class="flex items-center space-x-4">
+                <span id="userName" class="text-sm font-semibold hidden md:block"></span>
+                <div class="relative">
+                    <button id="userMenuButton" class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span class="text-sm font-semibold hidden md:block">Lecturer</span>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 transition-colors duration-200">Profile</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 transition-colors duration-200">Settings</a>
+                        <a href="AdminDashboard.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 transition-colors duration-200">Admin Dashboard</a>
+                        <button id="logoutBtn" class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200 transition-colors duration-200">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Student Details Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold" id="modalStudentName">Student Details</h3>
+                <button id="closeStudentModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <div id="studentModalContent">
+                <!-- Student details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Intervention Modal -->
+    <div id="interventionModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Create Intervention</h3>
+                <button id="closeInterventionModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <form id="interventionForm">
+                <input type="hidden" id="interventionStudentId">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Student</label>
+                    <p id="interventionStudentInfo" class="text-gray-600"></p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Intervention Type *</label>
+                    <select id="interventionType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Select Type</option>
+                        <option value="Academic Tutoring">Academic Tutoring</option>
+                        <option value="Counseling Session">Counseling Session</option>
+                        <option value="Mentoring Program">Mentoring Program</option>
+                        <option value="Progress Meeting">Progress Meeting</option>
+                        <option value="Study Skills Workshop">Study Skills Workshop</option>
+                        <option value="Parent Meeting">Parent Meeting</option>
+                        <option value="Academic Warning">Academic Warning</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Due Date *</label>
+                    <input type="date" id="interventionDueDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Owner *</label>
+                    <select id="interventionOwner" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Select Owner</option>
+                        <option value="Lecturer">Lecturer</option>
+                        <option value="Advisor">Advisor</option>
+                        <option value="Student">Student</option>
+                        <option value="Counselor">Counselor</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Notes</label>
+                    <textarea id="interventionNotes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Add notes about this intervention..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelIntervention" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Create Intervention</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div id="analysisModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Class Trends Analysis</h3>
+                <button id="closeAnalysisModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <div class="mb-6">
+                <form id="analysisForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Module</label>
+                        <select id="analysisModule" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="all">All Modules</option>
+                            <option value="STAT101">STAT101 - Elementary Statistics</option>
+                            <option value="MATH101">MATH101 - Calculus I</option>
+                            <option value="PHY101">PHY101 - Physics I</option>
+                            <option value="CS101">CS101 - Programming</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Start Date</label>
+                        <input type="date" id="analysisStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">End Date</label>
+                        <input type="date" id="analysisEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </form>
+                <button id="generateAnalysis" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Generate Analysis</button>
+            </div>
+            <div id="analysisResults" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card">
+                        <h4 class="text-lg font-semibold mb-2">Risk Distribution</h4>
+                        <canvas id="riskChart" width="400" height="300"></canvas>
+                    </div>
+                    <div class="card">
+                        <h4 class="text-lg font-semibold mb-2">Attendance Trends</h4>
+                        <canvas id="attendanceChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4 class="text-lg font-semibold mb-2">Performance by Module</h4>
+                    <canvas id="performanceChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8 mt-16">
+        <!-- Search and Risk Calculator Section -->
+        <div class="card mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Student Search & Risk Analysis</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Search Student by Name</label>
+                    <input id="studentSearchInput" type="text" placeholder="Enter student name..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                    <div id="searchResults" class="mt-2 bg-white border border-gray-300 rounded-lg shadow-lg hidden absolute z-10 w-full max-w-md"></div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Calculate Risk by Student ID</label>
+                    <div class="flex space-x-2">
+                        <input id="studentNumberInput" type="text" placeholder="Enter Student Number" class="flex-grow px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                        <button id="calculateBtn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200">
+                            Calculate
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="calculatorResult" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                <p id="resultText" class="text-lg font-medium text-gray-800"></p>
+                <p id="recommendationText" class="text-sm text-gray-600 mt-2"></p>
+            </div>
+            <div id="messageBox" class="mt-4 p-4 rounded-lg hidden">
+                <p id="messageText" class="text-sm"></p>
+            </div>
+        </div>
+
+        <!-- Student Data Table Section -->
+        <div class="card mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700">Student Metrics</h2>
+                <button id="analysisBtn" class="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-all duration-200">
+                    <i class="fas fa-chart-bar mr-2"></i>Class Analysis
+                </button>
+            </div>
+            <div id="loading" class="text-center text-gray-500 font-medium">Loading student data...</div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance (%)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignment Avg (%)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">LMS Activity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk Level</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Upload Document Section -->
+        <div class="card mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Upload Student Data (Excel)</h2>
+            <form id="uploadForm" class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                <input type="file" id="documentInput" accept=".xlsx,.xls" class="w-full md:w-auto flex-grow px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <input type="text" id="studentNumberUpload" placeholder="Student Number (optional)" class="w-full md:w-auto flex-grow px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <button type="submit" class="w-full md:w-auto px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition-all duration-200">
+                    Upload
+                </button>
+            </form>
+            <div id="uploadMessage" class="mt-4 p-4 rounded-lg hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const userNameEl = document.getElementById('userName');
+            const studentsTableBody = document.getElementById('studentsTableBody');
+            const loadingIndicator = document.getElementById('loading');
+            const studentNumberInput = document.getElementById('studentNumberInput');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const calculatorResult = document.getElementById('calculatorResult');
+            const resultText = document.getElementById('resultText');
+            const recommendationText = document.getElementById('recommendationText');
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const userMenuButton = document.getElementById('userMenuButton');
+            const userMenu = document.getElementById('userMenu');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const uploadForm = document.getElementById('uploadForm');
+            const documentInput = document.getElementById('documentInput');
+            const studentNumberUpload = document.getElementById('studentNumberUpload');
+            const uploadMessage = document.getElementById('uploadMessage');
+            const studentModal = document.getElementById('studentModal');
+            const closeStudentModal = document.getElementById('closeStudentModal');
+            const studentModalContent = document.getElementById('studentModalContent');
+            const interventionModal = document.getElementById('interventionModal');
+            const closeInterventionModal = document.getElementById('closeInterventionModal');
+            const interventionForm = document.getElementById('interventionForm');
+            const interventionStudentId = document.getElementById('interventionStudentId');
+            const interventionStudentInfo = document.getElementById('interventionStudentInfo');
+            const cancelIntervention = document.getElementById('cancelIntervention');
+            const analysisModal = document.getElementById('analysisModal');
+            const closeAnalysisModal = document.getElementById('closeAnalysisModal');
+            const analysisBtn = document.getElementById('analysisBtn');
+            const analysisForm = document.getElementById('analysisForm');
+            const generateAnalysis = document.getElementById('generateAnalysis');
+            const studentSearchInput = document.getElementById('studentSearchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            // Charts
+            let riskChart, attendanceChart, performanceChart;
+
+            // Show message box
+            function showMessage(text, isError = false) {
+                messageText.textContent = text;
+                messageBox.classList.remove('hidden');
+                messageBox.className = 'mt-4 p-4 rounded-lg ' + (isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700');
+            }
+
+            function showUploadMessage(text, isError = false) {
+                uploadMessage.textContent = text;
+                uploadMessage.classList.remove('hidden');
+                uploadMessage.className = 'mt-4 p-4 rounded-lg ' + (isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700');
+            }
+
+            // Get user info from localStorage
+            const userData = JSON.parse(localStorage.getItem('user_data')) || {};
+            userNameEl.textContent = `Welcome, ${userData.first_name || 'Lecturer'}`;
+
+            // Handle logout
+            logoutBtn.addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'Login.html';
+            });
+
+            // Fetch and display student data
+            async function fetchStudentData() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/students`);
+                    if (!response.ok) throw new Error('Failed to fetch student data');
+                    const students = await response.json();
+                    loadingIndicator.classList.add('hidden');
+                    studentsTableBody.innerHTML = '';
+                    students.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 transition-colors duration-200 cursor-pointer';
+                        const riskColor = getRiskColor(student.risk_level);
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.student_id || ''}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.first_name || ''}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.last_name || ''}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.program || ''}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.attendance_rate || 'N/A'}%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.assignment_avg || 'N/A'}%</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.lms_activity || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${riskColor}">
+                                    ${student.risk_level || 'N/A'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-blue-600 hover:text-blue-900 mr-3 view-student" data-id="${student.student_id}">View</button>
+                                <button class="text-green-600 hover:text-green-900 create-intervention" data-id="${student.student_id}" data-name="${student.first_name} ${student.last_name}">Intervene</button>
+                            </td>
+                        `;
+                        studentsTableBody.appendChild(row);
+                    });
+
+                    // Add event listeners to view buttons
+                    document.querySelectorAll('.view-student').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const studentId = button.getAttribute('data-id');
+                            viewStudentDetails(studentId);
+                        });
+                    });
+
+                    // Add event listeners to intervene buttons
+                    document.querySelectorAll('.create-intervention').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const studentId = button.getAttribute('data-id');
+                            const studentName = button.getAttribute('data-name');
+                            openInterventionModal(studentId, studentName);
+                        });
+                    });
+
+                    // Add click event to table rows
+                    document.querySelectorAll('#studentsTableBody tr').forEach(row => {
+                        row.addEventListener('click', () => {
+                            const studentId = row.querySelector('.view-student').getAttribute('data-id');
+                            viewStudentDetails(studentId);
+                        });
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching student data:', error);
+                    showMessage('Could not load student data. Please ensure the server is running.', true);
+                }
+            }
+
+            // View student details
+            async function viewStudentDetails(studentId) {
+                try {
+                    // Fetch risk data
+                    const riskResponse = await fetch(`${API_BASE_URL}/api/calculate_risk/${studentId}`);
+                    const riskData = await riskResponse.json();
+
+                    // Fetch performance data
+                    const performanceResponse = await fetch(`${API_BASE_URL}/api/performance/student/${studentId}`);
+                    const performanceData = await performanceResponse.ok ? await performanceResponse.json() : [];
+
+                    // Populate modal content
+                    studentModalContent.innerHTML = `
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold mb-2">Student Information</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Student ID</p>
+                                    <p class="font-medium">${riskData.student_id}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Name</p>
+                                    <p class="font-medium">${riskData.first_name} ${riskData.last_name}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Risk Level</p>
+                                    <p class="font-medium ${getRiskTextColor(riskData.risk_level)}">${riskData.risk_level}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Average Percentage</p>
+                                    <p class="font-medium">${riskData.average_percentage || riskData.risk_score || 0}%</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold mb-2">Recommendation</h4>
+                            <p class="text-gray-700">${riskData.recommendation || 'No recommendation available.'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Performance Records</h4>
+                            ${performanceData.length > 0 ? `
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Subject</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Mark</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Grade</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Type</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${performanceData.map(record => `
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-4 py-2 text-sm">${record.subject_name}</td>
+                                                    <td class="px-4 py-2 text-sm">${record.mark}/${record.max_mark}</td>
+                                                    <td class="px-4 py-2 text-sm"><span class="px-2 py-1 rounded ${getGradeColor(record.grade)}">${record.grade}</span></td>
+                                                    <td class="px-4 py-2 text-sm">${record.assessment_type}</td>
+                                                    <td class="px-4 py-2 text-sm">${new Date(record.assessment_date).toLocaleDateString()}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ` : '<p class="text-gray-500">No performance records found.</p>'}
+                        </div>
+                    `;
+
+                    studentModal.style.display = 'block';
+                } catch (error) {
+                    console.error('Error fetching student details:', error);
+                    studentModalContent.innerHTML = '<p class="text-red-500">Error loading student details.</p>';
+                }
+            }
+
+            // Open intervention modal
+            function openInterventionModal(studentId, studentName) {
+                interventionStudentId.value = studentId;
+                interventionStudentInfo.textContent = `${studentName} (${studentId})`;
+                interventionModal.style.display = 'block';
+            }
+
+            // Handle intervention form submission
+            interventionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const interventionData = {
+                    student_id: interventionStudentId.value,
+                    intervention_type: document.getElementById('interventionType').value,
+                    due_date: document.getElementById('interventionDueDate').value,
+                    owner: document.getElementById('interventionOwner').value,
+                    description: document.getElementById('interventionNotes').value,
+                    outcome: 'Pending'
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/interventions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(interventionData)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showMessage('Intervention created successfully!');
+                        interventionModal.style.display = 'none';
+                        interventionForm.reset();
+                        
+                        // Also send notification
+                        await fetch(`${API_BASE_URL}/api/send_notification`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                student_number: interventionData.student_id,
+                                message: `New intervention created: ${interventionData.intervention_type}. Due: ${interventionData.due_date}. Owner: ${interventionData.owner}.`
+                            })
+                        });
+                    } else {
+                        showMessage(result.error || 'Error creating intervention.', true);
+                    }
+                } catch (error) {
+                    console.error('Error creating intervention:', error);
+                    showMessage('Error creating intervention.', true);
+                }
+            });
+
+            // Search students by name
+            studentSearchInput.addEventListener('input', async (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/search/students?q=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const students = await response.json();
+                        displaySearchResults(students);
+                    }
+                } catch (error) {
+                    console.error('Error searching students:', error);
+                }
+            });
+
+            // Display search results
+            function displaySearchResults(students) {
+                if (students.length === 0) {
+                    searchResults.innerHTML = '<div class="p-3 text-gray-500">No students found</div>';
+                    searchResults.classList.remove('hidden');
+                    return;
+                }
+
+                searchResults.innerHTML = students.map(student => `
+                    <div class="p-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer" 
+                         data-id="${student.student_id}" 
+                         data-name="${student.first_name} ${student.last_name}">
+                        <div class="font-medium">${student.first_name} ${student.last_name}</div>
+                        <div class="text-sm text-gray-500">${student.student_id} • ${student.program}</div>
+                        <div class="text-sm">Risk: <span class="${getRiskTextColor(student.risk_level)}">${student.risk_level}</span></div>
+                    </div>
+                `).join('');
+
+                // Add click event to search results
+                searchResults.querySelectorAll('div').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const studentId = item.getAttribute('data-id');
+                        const studentName = item.getAttribute('data-name');
+                        studentSearchInput.value = `${studentName} (${studentId})`;
+                        searchResults.classList.add('hidden');
+                        
+                        // Display risk info
+                        displayStudentRiskInfo(studentId, studentName);
+                    });
+                });
+
+                searchResults.classList.remove('hidden');
+            }
+
+            // Display student risk information
+            async function displayStudentRiskInfo(studentId, studentName) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/calculate_risk/${studentId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        calculatorResult.classList.remove('hidden');
+                        const riskColor = getRiskColor(data.risk_level);
+                        resultText.innerHTML = `
+                            Risk Level for ${studentName}: <span class="font-bold ${riskColor}">${data.risk_level}</span>
+                        `;
+                        recommendationText.textContent = `Recommendation: ${data.recommendation}`;
+                    }
+                } catch (error) {
+                    console.error('Error fetching risk info:', error);
+                }
+            }
+
+            // Generate analysis charts
+            generateAnalysis.addEventListener('click', async () => {
+                try {
+                    // In a real implementation, you would fetch actual data from the backend
+                    // For now, we'll use mock data
+                    
+                    // Risk Distribution Chart
+                    if (riskChart) riskChart.destroy();
+                    riskChart = new Chart(document.getElementById('riskChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Low Risk', 'Medium Risk', 'High Risk', 'Very High Risk'],
+                            datasets: [{
+                                data: [15, 25, 8, 2],
+                                backgroundColor: ['#10B981', '#F59E0B', '#EF4444', '#7C2D12']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+
+                    // Attendance Trends Chart
+                    if (attendanceChart) attendanceChart.destroy();
+                    attendanceChart = new Chart(document.getElementById('attendanceChart'), {
+                        type: 'line',
+                        data: {
+                            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                            datasets: [{
+                                label: 'Average Attendance (%)',
+                                data: [85, 82, 78, 80, 75, 72],
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100
+                                }
+                            }
+                        }
+                    });
+
+                    // Performance by Module Chart
+                    if (performanceChart) performanceChart.destroy();
+                    performanceChart = new Chart(document.getElementById('performanceChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['STAT101', 'MATH101', 'PHY101', 'CS101'],
+                            datasets: [{
+                                label: 'Average Score (%)',
+                                data: [72, 68, 65, 75],
+                                backgroundColor: '#8B5CF6'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100
+                                }
+                            }
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Error generating analysis:', error);
+                }
+            });
+
+            // Open analysis modal
+            analysisBtn.addEventListener('click', () => {
+                analysisModal.style.display = 'block';
+            });
+
+            // Close modals
+            closeStudentModal.addEventListener('click', () => studentModal.style.display = 'none');
+            closeInterventionModal.addEventListener('click', () => interventionModal.style.display = 'none');
+            closeAnalysisModal.addEventListener('click', () => analysisModal.style.display = 'none');
+            cancelIntervention.addEventListener('click', () => interventionModal.style.display = 'none');
+
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === studentModal) studentModal.style.display = 'none';
+                if (e.target === interventionModal) interventionModal.style.display = 'none';
+                if (e.target === analysisModal) analysisModal.style.display = 'none';
+            });
+
+            // Calculate risk for a student
+            async function calculateRisk() {
+                const studentNumber = studentNumberInput.value.trim();
+                if (!studentNumber) {
+                    showMessage('Please enter a student number.', true);
+                    return;
+                }
+                calculatorResult.classList.remove('hidden');
+                resultText.textContent = 'Calculating risk...';
+                recommendationText.textContent = '';
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/calculate_risk/${studentNumber}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        const riskColor = getRiskColor(data.risk_level);
+                        resultText.innerHTML = `
+                            Risk Level for ${studentNumber}: <span class="font-bold ${riskColor}">${data.risk_level}</span>
+                        `;
+                        recommendationText.textContent = `Recommendation: ${data.recommendation}`;
+                    } else {
+                        resultText.textContent = `Error: ${data.error}`;
+                        recommendationText.textContent = '';
+                    }
+                } catch (error) {
+                    resultText.textContent = 'An error occurred. Is the student number correct?';
+                    recommendationText.textContent = '';
+                    console.error('Error calculating risk:', error);
+                }
+            }
+
+            // Upload Excel document
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const file = documentInput.files[0];
+                const studentNumber = studentNumberUpload.value.trim();
+                if (!file) {
+                    showUploadMessage('Please select an Excel file to upload.', true);
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('document', file);
+                if (studentNumber) formData.append('studentNumber', studentNumber);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/upload_document`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        showUploadMessage(result.message || 'Document uploaded successfully.');
+                        fetchStudentData();
+                    } else {
+                        showUploadMessage(result.error || 'Upload failed.', true);
+                    }
+                } catch (error) {
+                    showUploadMessage('An error occurred during upload.', true);
+                    console.error('Upload error:', error);
+                }
+            });
+
+            // Utility functions
+            function getRiskColor(level) {
+                switch (level) {
+                    case 'Low': return 'bg-green-100 text-green-800';
+                    case 'Medium': return 'bg-yellow-100 text-yellow-800';
+                    case 'High': return 'bg-red-100 text-red-800';
+                    case 'Very High': return 'bg-red-800 text-white';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            }
+
+            function getRiskTextColor(level) {
+                switch (level) {
+                    case 'Low': return 'text-green-600';
+                    case 'Medium': return 'text-yellow-600';
+                    case 'High': return 'text-red-600';
+                    case 'Very High': return 'text-red-800';
+                    default: return 'text-gray-600';
+                }
+            }
+
+            function getGradeColor(grade) {
+                switch (grade) {
+                    case 'A': return 'bg-green-100 text-green-800';
+                    case 'B': return 'bg-blue-100 text-blue-800';
+                    case 'C': return 'bg-yellow-100 text-yellow-800';
+                    case 'D': return 'bg-orange-100 text-orange-800';
+                    case 'F': return 'bg-red-100 text-red-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            }
+
+            // Toggle user menu
+            userMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                userMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!userMenu.contains(event.target) && !userMenuButton.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+
+            calculateBtn.addEventListener('click', calculateRisk);
+
+            // Initial data load
+            fetchStudentData();
+        });
+    </script>
+</body>
+</html>

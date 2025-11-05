@@ -1,0 +1,62 @@
+2025-10-06 12:14:20,704 - INFO - Machine learning model trained and saved.
+2025-10-06 12:14:20,734 - INFO - Machine learning model loaded successfully.
+2025-10-06 12:14:20,830 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-06 12:14:20,830 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 12:14:20,841 - INFO -  * Restarting with stat
+2025-10-06 12:14:23,607 - INFO - Machine learning model trained and saved.
+2025-10-06 12:14:23,635 - INFO - Machine learning model loaded successfully.
+2025-10-06 12:14:23,676 - WARNING -  * Debugger is active!
+2025-10-06 12:14:23,680 - INFO -  * Debugger PIN: 800-120-221
+2025-10-06 12:16:38,074 - INFO - 127.0.0.1 - - [06/Oct/2025 12:16:38] "GET / HTTP/1.1" 200 -
+2025-10-06 12:16:38,245 - INFO - 127.0.0.1 - - [06/Oct/2025 12:16:38] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-06 18:19:56,621 - INFO - Machine learning model trained and saved.
+2025-10-06 18:19:56,656 - INFO - Machine learning model loaded successfully.
+2025-10-06 18:19:56,830 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.10.57.137:5000
+2025-10-06 18:19:56,840 - INFO - [33mPress CTRL+C to quit[0m
+2025-10-06 18:20:11,061 - INFO - 127.0.0.1 - - [06/Oct/2025 18:20:11] "GET / HTTP/1.1" 200 -
+2025-10-06 18:20:14,011 - INFO - 127.0.0.1 - - [06/Oct/2025 18:20:14] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-06 18:31:36,797 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:31:36,798 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:31:36,800 - INFO - 127.0.0.1 - - [06/Oct/2025 18:31:36] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:31:36,825 - INFO - 127.0.0.1 - - [06/Oct/2025 18:31:36] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -
+2025-10-06 18:32:06,376 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:32:06,378 - INFO - 127.0.0.1 - - [06/Oct/2025 18:32:06] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:32:20,057 - INFO - 127.0.0.1 - - [06/Oct/2025 18:32:20] "OPTIONS /api/students HTTP/1.1" 200 -
+2025-10-06 18:32:26,949 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:32:26,950 - INFO - 127.0.0.1 - - [06/Oct/2025 18:32:26] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -
+2025-10-06 18:32:26,970 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:32:26,975 - INFO - 127.0.0.1 - - [06/Oct/2025 18:32:26] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:32:57,140 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:32:57,141 - INFO - 127.0.0.1 - - [06/Oct/2025 18:32:57] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:33:27,144 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:33:27,146 - INFO - 127.0.0.1 - - [06/Oct/2025 18:33:27] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:33:57,185 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:33:57,187 - INFO - 127.0.0.1 - - [06/Oct/2025 18:33:57] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:34:27,151 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:34:27,153 - INFO - 127.0.0.1 - - [06/Oct/2025 18:34:27] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:34:57,141 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:34:57,142 - INFO - 127.0.0.1 - - [06/Oct/2025 18:34:57] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:35:09,318 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:09,320 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:09] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -
+2025-10-06 18:35:09,337 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:09,339 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:09] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:35:18,182 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:18,182 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:18,183 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:18] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -
+2025-10-06 18:35:18,183 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:18] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:35:24,672 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:24,672 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:24,674 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:24] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:35:24,675 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:24] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -
+2025-10-06 18:35:33,554 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:33,555 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:33] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -
+2025-10-06 18:35:33,570 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:35:33,571 - INFO - 127.0.0.1 - - [06/Oct/2025 18:35:33] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:36:04,367 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:36:04,368 - ERROR - Error connecting to MySQL database: 2003: Can't connect to MySQL server on 'localhost:3306' (Errno 10061: No connection could be made because the target machine actively refused it)
+2025-10-06 18:36:04,369 - INFO - 127.0.0.1 - - [06/Oct/2025 18:36:04] "[35m[1mGET /api/notifications HTTP/1.1[0m" 500 -
+2025-10-06 18:36:04,371 - INFO - 127.0.0.1 - - [06/Oct/2025 18:36:04] "[35m[1mGET /api/students HTTP/1.1[0m" 500 -

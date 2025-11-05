@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lecturer Dashboard - Student Management</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        nav {
+            background: #2563eb;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 8px 18px;
+            border-radius: 5px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        nav a.active, nav a:hover {
+            background: #1d4ed8;
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            gap: 30px;
+            width: 100%;
+            max-width: 1400px;
+        }
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        #searchInput {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-success {
+            background-color: #10b981;
+        }
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        .btn-warning {
+            background-color: #f59e0b;
+        }
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        th {
+            background: #f3f4f6;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tbody tr:hover {
+            background-color: #f9fafb;
+            cursor: pointer;
+        }
+        .action-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+        .card {
+            background-color: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card form {
+            display: flex;
+            flex-direction: column;
+        }
+        .card label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #374151;
+        }
+        .card input, .card textarea, .card select {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .card button {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .card button:hover {
+            background-color: #1d4ed8;
+        }
+        #notification-bar {
+            background-color: #1d4ed8;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        .risk-low { background: #dcfce7; color: #166534; }
+        .risk-medium { background: #fef3c7; color: #92400e; }
+        .risk-high { background: #fee2e2; color: #991b1b; }
+        .risk-very-high { background: #fecaca; color: #7f1d1d; }
+        .risk-no-data { background: #f3f4f6; color: #6b7280; }
+
+        @media (max-width: 900px) {
+            .action-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="Home.html"><i class="fa fa-home"></i> Home</a>
+        <a href="AdminDashboard.html" class="active"><i class="fa fa-chart-line"></i> Dashboard</a>
+        <a href="Dashboard Calculator.html"><i class="fa fa-users"></i> Advanced Dashboard</a>
+        <a href="Login.html"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </nav>
+
+    <!-- Student Details Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalStudentName">Student Details</h3>
+                <button class="close-modal" id="closeStudentModal">&times;</button>
+            </div>
+            <div id="studentModalContent">
+                <!-- Student details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Performance Modal -->
+    <div id="performanceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Student Performance</h3>
+                <button class="close-modal" id="closePerformanceModal">&times;</button>
+            </div>
+            <form id="performanceForm">
+                <input type="hidden" id="performanceStudentId">
+                <div style="margin-bottom: 15px;">
+                    <label><strong>Student</strong></label>
+                    <p id="performanceStudentInfo" style="margin: 5px 0; padding: 8px; background: #f3f4f6; border-radius: 5px;"></p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label for="subjectCode">Subject Code *</label>
+                        <input type="text" id="subjectCode" required>
+                    </div>
+                    <div>
+                        <label for="subjectName">Subject Name *</label>
+                        <input type="text" id="subjectName" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label for="mark">Mark *</label>
+                        <input type="number" id="mark" step="0.01" required>
+                    </div>
+                    <div>
+                        <label for="maxMark">Max Mark *</label>
+                        <input type="number" id="maxMark" value="100" step="0.01" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label for="assessmentType">Assessment Type *</label>
+                        <select id="assessmentType" required>
+                            <option value="">Select Type</option>
+                            <option value="Exam">Exam</option>
+                            <option value="Test">Test</option>
+                            <option value="Assignment">Assignment</option>
+                            <option value="Project">Project</option>
+                            <option value="Practical">Practical</option>
+                            <option value="Quiz">Quiz</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="assessmentDate">Assessment Date *</label>
+                        <input type="date" id="assessmentDate" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label for="semester">Semester *</label>
+                        <select id="semester" required>
+                            <option value="1">Semester 1</option>
+                            <option value="2" selected>Semester 2</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="academicYear">Academic Year *</label>
+                        <input type="number" id="academicYear" value="2024" required>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" id="cancelPerformance" class="btn btn-warning">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Performance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Notification Bar (Initially hidden) -->
+        <div id="notification-bar"></div>
+
+        <div class="dashboard-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Lecturer Dashboard - Student Management</h2>
+                <div style="display: flex; gap: 10px;">
+                    <a href="Dashboard Calculator.html" class="btn btn-warning">
+                        <i class="fa fa-chart-bar"></i> Advanced Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by student name, ID, or program...">
+                <button class="btn" id="calculateRiskBtn">
+                    <i class="fa fa-calculator"></i> Calculate Risk
+                </button>
+            </div>
+
+            <div class="dashboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Program</th>
+                            <th>Attendance</th>
+                            <th>Assignment Avg</th>
+                            <th>LMS Activity</th>
+                            <th>Risk Level</th>
+                            <th>Last Risk Check</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                        <!-- Student data will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="action-container">
+            <!-- Upload Document Section -->
+            <div class="card upload-card">
+                <h3>Upload Student Data</h3>
+                <form id="uploadForm">
+                    <label for="studentNumberUpload">Student Number (optional):</label>
+                    <input type="text" id="studentNumberUpload" name="studentNumber">
+                    <label for="documentFile">Select Excel File:</label>
+                    <input type="file" id="documentFile" name="document" accept=".xlsx,.xls" required>
+                    <button type="submit">Upload Data</button>
+                </form>
+            </div>
+
+            <!-- Message Student Section -->
+            <div class="card message-card">
+                <h3>Send Notification</h3>
+                <form id="messageForm">
+                    <label for="studentNumberMessage">Student Number:</label>
+                    <input type="text" id="studentNumberMessage" name="studentNumber" required>
+                    <label for="messageContent">Message:</label>
+                    <textarea id="messageContent" name="message" rows="4" required placeholder="Enter notification message for the student..."></textarea>
+                    <button type="submit">Send Notification</button>
+                </form>
+            </div>
+
+            <!-- Quick Add Performance Section -->
+            <div class="card performance-card">
+                <h3>Quick Add Performance</h3>
+                <form id="quickPerformanceForm">
+                    <label for="quickStudentId">Student ID *</label>
+                    <input type="text" id="quickStudentId" required placeholder="Enter student ID">
+                    
+                    <label for="quickSubjectCode">Subject Code *</label>
+                    <input type="text" id="quickSubjectCode" required placeholder="e.g., STAT101">
+                    
+                    <label for="quickSubjectName">Subject Name *</label>
+                    <input type="text" id="quickSubjectName" required placeholder="e.g., Elementary Statistics">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label for="quickMark">Mark *</label>
+                            <input type="number" id="quickMark" step="0.01" required placeholder="0-100">
+                        </div>
+                        <div>
+                            <label for="quickMaxMark">Max Mark</label>
+                            <input type="number" id="quickMaxMark" value="100" step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <label for="quickAssessmentType">Assessment Type *</label>
+                    <select id="quickAssessmentType" required>
+                        <option value="">Select Type</option>
+                        <option value="Test">Test</option>
+                        <option value="Assignment">Assignment</option>
+                        <option value="Exam">Exam</option>
+                        <option value="Project">Project</option>
+                    </select>
+                    
+                    <button type="submit">Add Performance Record</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Box -->
+    <div id="message-box" class="message-box"></div>
+
+    <script>
+    const API_BASE_URL = 'http://127.0.0.1:5000';
+
+    // Function to display a custom message box
+    function showMessage(message, isError = false) {
+        const msgBox = document.getElementById('message-box');
+        msgBox.textContent = message;
+        msgBox.style.display = 'block';
+        msgBox.style.background = isError ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.8)';
+        msgBox.style.opacity = 1;
+        
+        setTimeout(() => {
+            msgBox.style.opacity = 0;
+            msgBox.addEventListener('transitionend', () => {
+                msgBox.style.display = 'none';
+            }, { once: true });
+        }, 3000);
+    }
+
+    // Variable to store all student data
+    let allStudents = [];
+    const studentTableBody = document.getElementById('studentTableBody');
+    const searchInput = document.getElementById('searchInput');
+
+    // Function to fetch and display student data from the backend
+    async function fetchStudentData() {
+        try {
+            const response = await fetch(API_BASE_URL + '/api/students');
+            if (!response.ok) {
+                throw new Error('Failed to fetch student data');
+            }
+            allStudents = await response.json();
+            renderTable(allStudents);
+        } catch (error) {
+            console.error('Error fetching student data:', error);
+            showMessage('Could not load student data. Please ensure the server is running.', true);
+        }
+    }
+
+    // Function to render the table with the given data
+    function renderTable(students) {
+        studentTableBody.innerHTML = ''; // Clear existing table rows
+        if (students.length === 0) {
+            studentTableBody.innerHTML = '<tr><td colspan="10">No students found.</td></tr>';
+            return;
+        }
+        
+        students.forEach(student => {
+            const row = document.createElement('tr');
+            const riskColor = getRiskColor(student.risk_level);
+            
+            row.innerHTML = `
+                <td>${student.student_id || 'N/A'}</td>
+                <td>${student.first_name || 'N/A'}</td>
+                <td>${student.last_name || 'N/A'}</td>
+                <td>${student.program || 'N/A'}</td>
+                <td>${student.attendance_percentage || student.attendance_rate || 'N/A'}%</td>
+                <td>${student.assignment_avg || 'N/A'}%</td>
+                <td>${student.lms_activity_score || student.lms_activity || 'N/A'}%</td>
+                <td><span class="risk-badge ${riskColor}">${student.risk_level || 'No Data'}</span></td>
+                <td>
+                    ${student.last_risk_check ? 
+                        `Risk: ${getLastActivityText(student)}` : 
+                        (student.last_login ? `Login: ${getLastActivityText({last_risk_check: student.last_login})}` : 'No activity')
+                    }
+                </td>
+                <td>
+                    <button class="btn" onclick="viewStudentDetails('${student.student_id}')" style="padding: 5px 10px; font-size: 12px;">
+                        <i class="fa fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-success" onclick="addStudentPerformance('${student.student_id}', '${student.first_name} ${student.last_name}')" style="padding: 5px 10px; font-size: 12px;">
+                        <i class="fa fa-plus"></i> Add Marks
+                    </button>
+                </td>
+            `;
+            studentTableBody.appendChild(row);
+        });
+    }
+
+    // Get risk color class
+    function getRiskColor(level) {
+        if (!level) return 'risk-no-data';
+        switch (level.toLowerCase()) {
+            case 'low': return 'risk-low';
+            case 'medium': return 'risk-medium';
+            case 'high': return 'risk-high';
+            case 'very high': return 'risk-very-high';
+            default: return 'risk-no-data';
+        }
+    }
+
+    // Updated function to display real activity data
+    function getLastActivityText(student) {
+        // Use last_risk_check if available, otherwise use last_login
+        const activityDate = student.last_risk_check || student.last_login;
+        
+        if (!activityDate) {
+            return 'Never active';
+        }
+        
+        const activityTime = new Date(activityDate);
+        const now = new Date();
+        const diffTime = Math.abs(now - activityTime);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+        
+        if (diffMinutes < 60) {
+            return `${diffMinutes} min ago`;
+        } else if (diffHours < 24) {
+            return `${diffHours} hours ago`;
+        } else if (diffDays === 1) {
+            return 'Yesterday';
+        } else if (diffDays < 7) {
+            return `${diffDays} days ago`;
+        } else if (diffDays < 30) {
+            return `${Math.floor(diffDays/7)} weeks ago`;
+        } else {
+            return `${Math.floor(diffDays/30)} months ago`;
+        }
+    }// Close modals
+
+    // View student details
+    async function viewStudentDetails(studentId) {
+        try {
+            // Fetch risk data
+            const riskResponse = await fetch(API_BASE_URL + '/api/calculate_risk/' + studentId);
+            const riskData = await riskResponse.json();
+
+            // Fetch performance data
+            const performanceResponse = await fetch(API_BASE_URL + '/api/performance/student/' + studentId);
+            const performanceData = await performanceResponse.ok ? await performanceResponse.json() : [];
+
+            // Populate modal content
+            document.getElementById('modalStudentName').textContent = 'Student Details - ' + riskData.first_name + ' ' + riskData.last_name;
+            
+            const modalContent = document.getElementById('studentModalContent');
+            modalContent.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #2563eb; margin-bottom: 15px;">Student Information</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <strong>Student ID:</strong> ${riskData.student_id}
+                        </div>
+                        <div>
+                            <strong>Name:</strong> ${riskData.first_name} ${riskData.last_name}
+                        </div>
+                        <div>
+                            <strong>Risk Level:</strong> <span class="risk-badge ${getRiskColor(riskData.risk_level)}">${riskData.risk_level}</span>
+                        </div>
+                        <div>
+                            <strong>Average Percentage:</strong> ${riskData.average_percentage || riskData.risk_score || 0}%
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #2563eb; margin-bottom: 15px;">Recommendation</h4>
+                    <p>${riskData.recommendation || 'No recommendation available.'}</p>
+                </div>
+                <div>
+                    <h4 style="color: #2563eb; margin-bottom: 15px;">Performance Records</h4>
+                    ${performanceData.length > 0 ? `
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead style="background: #f3f4f6;">
+                                    <tr>
+                                        <th style="padding: 8px; border: 1px solid #e5e7eb;">Subject</th>
+                                        <th style="padding: 8px; border: 1px solid #e5e7eb;">Mark</th>
+                                        <th style="padding: 8px; border: 1px solid #e5e7eb;">Grade</th>
+                                        <th style="padding: 8px; border: 1px solid #e5e7eb;">Type</th>
+                                        <th style="padding: 8px; border: 1px solid #e5e7eb;">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${performanceData.map(record => `
+                                        <tr>
+                                            <td style="padding: 8px; border: 1px solid #e5e7eb;">${record.subject_name}</td>
+                                            <td style="padding: 8px; border: 1px solid #e5e7eb;">${record.mark}/${record.max_mark}</td>
+                                            <td style="padding: 8px; border: 1px solid #e5e7eb;">
+                                                <span style="padding: 2px 6px; border-radius: 4px; background: ${getGradeColor(record.grade).background}; color: ${getGradeColor(record.grade).color}">
+                                                    ${record.grade}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 8px; border: 1px solid #e5e7eb;">${record.assessment_type}</td>
+                                            <td style="padding: 8px; border: 1px solid #e5e7eb;">${new Date(record.assessment_date).toLocaleDateString()}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : '<p style="color: #6b7280;">No performance records found.</p>'}
+                </div>
+            `;
+
+            document.getElementById('studentModal').style.display = 'block';
+        } catch (error) {
+            console.error('Error fetching student details:', error);
+            showMessage('Error loading student details.', true);
+        }
+    }
+
+    // Add student performance
+    function addStudentPerformance(studentId, studentName) {
+        document.getElementById('performanceStudentId').value = studentId;
+        document.getElementById('performanceStudentInfo').textContent = studentName + ' (' + studentId + ')';
+        
+        // Set default date to today
+        document.getElementById('assessmentDate').value = new Date().toISOString().split('T')[0];
+        
+        document.getElementById('performanceModal').style.display = 'block';
+    }
+
+    // Get grade color
+    function getGradeColor(grade) {
+        switch (grade) {
+            case 'A': return { background: '#dcfce7', color: '#166534' };
+            case 'B': return { background: '#bbf7d0', color: '#15803d' };
+            case 'C': return { background: '#fef3c7', color: '#92400e' };
+            case 'D': return { background: '#fed7aa', color: '#c2410c' };
+            case 'F': return { background: '#fecaca', color: '#991b1b' };
+            default: return { background: '#f3f4f6', color: '#6b7280' };
+        }
+    }
+
+    // Filter students based on search input
+    searchInput.addEventListener('keyup', (event) => {
+        const searchTerm = event.target.value.toLowerCase();
+        const filteredStudents = allStudents.filter(student =>
+            (student.first_name && student.first_name.toLowerCase().includes(searchTerm)) ||
+            (student.last_name && student.last_name.toLowerCase().includes(searchTerm)) ||
+            (student.student_id && student.student_id.toString().includes(searchTerm)) ||
+            (student.program && student.program.toLowerCase().includes(searchTerm))
+        );
+        renderTable(filteredStudents);
+    });
+
+    // Handle document upload form submission
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+        const fileInput = document.getElementById('documentFile');
+        const studentNumber = document.getElementById('studentNumberUpload').value;
+
+        if (fileInput.files.length === 0) {
+            showMessage('Please select a file to upload.', true);
+            return;
+        }
+
+        formData.append('document', fileInput.files[0]);
+        if (studentNumber) {
+            formData.append('studentNumber', studentNumber);
+        }
+
+        try {
+            const response = await fetch(API_BASE_URL + '/api/upload_document', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message || 'File uploaded successfully!');
+                fetchStudentData();
+                this.reset();
+            } else {
+                showMessage(result.error || 'Upload failed.', true);
+            }
+        } catch (error) {
+            console.error('Error uploading document:', error);
+            showMessage('An error occurred during upload.', true);
+        }
+    });
+
+    // Handle message form submission
+    document.getElementById('messageForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const studentNumber = document.getElementById('studentNumberMessage').value;
+        const message = document.getElementById('messageContent').value;
+        const data = { student_number: studentNumber, message: message };
+
+        try {
+            const response = await fetch(API_BASE_URL + '/api/send_notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message || 'Notification sent successfully!');
+                this.reset();
+            } else {
+                showMessage(result.message || 'Failed to send message.', true);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            showMessage('An error occurred while sending the message.', true);
+        }
+    });
+
+    // Handle quick performance form submission
+    document.getElementById('quickPerformanceForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const studentId = document.getElementById('quickStudentId').value;
+        
+        // Check if student exists
+        const studentExists = allStudents.some(student => student.student_id == studentId);
+        if (!studentExists) {
+            showMessage('Student not found. Please check the Student ID.', true);
+            return;
+        }
+
+        const performanceData = {
+            student_id: studentId,
+            subject_code: document.getElementById('quickSubjectCode').value,
+            subject_name: document.getElementById('quickSubjectName').value,
+            mark: parseFloat(document.getElementById('quickMark').value),
+            max_mark: parseFloat(document.getElementById('quickMaxMark').value),
+            assessment_type: document.getElementById('quickAssessmentType').value,
+            assessment_date: new Date().toISOString().split('T')[0],
+            semester: '2',
+            academic_year: 2024
+        };
+
+        try {
+            const response = await fetch(API_BASE_URL + '/api/performance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(performanceData),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message || 'Performance record added successfully!');
+                this.reset();
+                fetchStudentData(); // Refresh the table
+            } else {
+                showMessage(result.error || 'Failed to add performance record.', true);
+            }
+        } catch (error) {
+            console.error('Error adding performance:', error);
+            showMessage('An error occurred while adding the performance record.', true);
+        }
+    });
+
+    // Handle performance form submission
+    document.getElementById('performanceForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const performanceData = {
+            student_id: document.getElementById('performanceStudentId').value,
+            subject_code: document.getElementById('subjectCode').value,
+            subject_name: document.getElementById('subjectName').value,
+            mark: parseFloat(document.getElementById('mark').value),
+            max_mark: parseFloat(document.getElementById('maxMark').value),
+            assessment_type: document.getElementById('assessmentType').value,
+            assessment_date: document.getElementById('assessmentDate').value,
+            semester: document.getElementById('semester').value,
+            academic_year: parseInt(document.getElementById('academicYear').value)
+        };
+
+        try {
+            const response = await fetch(API_BASE_URL + '/api/performance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(performanceData),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message || 'Performance record added successfully!');
+                this.reset();
+                document.getElementById('performanceModal').style.display = 'none';
+                fetchStudentData(); // Refresh the table
+            } else {
+                showMessage(result.error || 'Failed to add performance record.', true);
+            }
+        } catch (error) {
+            console.error('Error adding performance:', error);
+            showMessage('An error occurred while adding the performance record.', true);
+        }
+    });
+
+    // Calculate risk for selected student
+    document.getElementById('calculateRiskBtn').addEventListener('click', async function() {
+        const searchTerm = searchInput.value.trim();
+        if (!searchTerm) {
+            showMessage('Please enter a student ID or name to calculate risk.', true);
+            return;
+        }
+
+        // Find student by ID or name
+        const student = allStudents.find(s => 
+            s.student_id.toString() === searchTerm || 
+            (s.first_name && s.last_name && (s.first_name + ' ' + s.last_name).toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+
+        if (!student) {
+            showMessage('Student not found. Please check the student ID or name.', true);
+            return;
+        }
+
+        try {
+            const response = await fetch(API_BASE_URL + '/api/calculate_risk/' + student.student_id);
+            const result = await response.json();
+            if (response.ok) {
+                showMessage('Risk calculated for ' + student.first_name + ' ' + student.last_name + ': ' + result.risk_level);
+                fetchStudentData(); // Refresh to show updated risk
+            } else {
+                showMessage(result.error || 'Failed to calculate risk.', true);
+            }
+        } catch (error) {
+            console.error('Error calculating risk:', error);
+            showMessage('An error occurred while calculating risk.', true);
+        }
+    });
+
+    // Modal close handlers
+    document.getElementById('closeStudentModal').addEventListener('click', function() {
+        document.getElementById('studentModal').style.display = 'none';
+    });
+
+    document.getElementById('closePerformanceModal').addEventListener('click', function() {
+        document.getElementById('performanceModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelPerformance').addEventListener('click', function() {
+        document.getElementById('performanceModal').style.display = 'none';
+    });
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('studentModal')) {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+        if (e.target === document.getElementById('performanceModal')) {
+            document.getElementById('performanceModal').style.display = 'none';
+        }
+    });
+
+    // Initial data fetch when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchStudentData();
+        
+        // Check if user is logged in as lecturer
+        const userData = JSON.parse(localStorage.getItem('user_data'));
+        if (!userData || userData.role !== 'lecturer') {
+            showMessage('Please log in as a lecturer to access this dashboard.', true);
+            setTimeout(() => {
+                window.location.href = 'Login.html';
+            }, 2000);
+        }
+    });
+    </script>
+</body>
+</html>

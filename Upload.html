@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University of Zululand - Student Data Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-4xl w-full fade-in">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-blue-900 mb-2">University of Zululand</h1>
+            <h2 class="text-2xl font-semibold text-gray-800">Student Data Excel Generator</h2>
+            <p class="text-gray-600 mt-4">Generate a comprehensive Excel file with 45 student records</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"></path>
+                    </svg>
+                    Dataset Overview
+                </h3>
+                <ul class="space-y-2 text-sm text-blue-700">
+                    <li class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> 45 Students with 9-digit IDs</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> Complete academic performance data</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> Proper University of Zululand emails</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> Realistic academic programs</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> Risk assessment calculations</li>
+                </ul>
+            </div>
+
+            <div class="bg-green-50 p-6 rounded-xl border border-green-200">
+                <h3 class="text-lg font-semibold text-green-800 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Ready for Upload
+                </h3>
+                <ul class="space-y-2 text-sm text-green-700">
+                    <li class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Compatible with Lecturer Dashboard</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> All necessary data relationships</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Realistic academic performance</li>
+                    <li class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Formatted for easy processing</li>
+                </ul>
+            </div>
+        </div>
+
+        <button id="downloadBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center group">
+            <svg class="w-6 h-6 mr-3 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Generate & Download Student Data Excel File (45 Students)
+        </button>
+
+        <div id="downloadMessage" class="mt-4 p-4 rounded-lg hidden text-center fade-in"></div>
+
+        <div class="mt-8 border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-3">Sample Student Preview</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-gray-50 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Student ID</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Program</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">230000473</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">John Smith</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">Computer Science</td>
+                            <td class="px-4 py-3 text-sm text-blue-600">john.smith@student.unizulu.ac.za</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">230000474</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">Sarah Johnson</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">Information Technology</td>
+                            <td class="px-4 py-3 text-sm text-blue-600">sarah.johnson@student.unizulu.ac.za</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">230000475</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">Michael Brown</td>
+                            <td class="px-4 py-3 text-sm text-gray-700">Data Science</td>
+                            <td class="px-4 py-3 text-sm text-blue-600">michael.brown@student.unizulu.ac.za</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // Show loading state
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating Excel File...';
+            btn.disabled = true;
+
+            // Create the Excel workbook
+            try {
+                const workbook = XLSX.utils.book_new();
+
+                // Student data - 45 University of Zululand students
+                const studentsData = [
+                    // Student ID, First Name, Last Name, Program, Email, Year of Study, Last Login, Last Risk Check
+                    // added `assessment_avg` (index 8) — populated later from performanceData
+                    ['student_id', 'first_name', 'last_name', 'program', 'email', 'year_of_study', 'last_login', 'last_risk_check', 'assessment_avg', 'assignment_avg', 'password_hash'],
+                    ['230000473', 'Sibusiso', 'Mkhize', 'Mathematical Science', '230000473@stu.unizulu.ac.za', 2, '2025-10-01', '2025-09-15', '', '67.00', '230000473'],
+                    ['230000474', 'Nosipho', 'Dlamini', 'Mathematical Science', '230000474@stu.unizulu.ac.za', 2, '2025-11-02', '2025-09-14', '', '68.00', '230000474'],
+                    ['230000475', 'Mthokozisi', 'Zuma', 'Mathematical Science', '230000475@stu.unizulu.ac.za', 3, '2025-10-03', '2025-09-13', '', '69.00', '230000475'],
+                    ['230000476', 'Phindile', 'Ngcobo', 'Mathematical Science', '230000476@stu.unizulu.ac.za', 2, '2025-11-01', '2025-09-16', '', '70.00', '230000476'],
+                    ['230000477', 'Sibongile', 'Buthelezi', 'Mathematical Science', '230000477@stu.unizulu.ac.za', 2, '2025-10-04', '2025-09-12', '', '71.00', '230000477'],
+                    ['230000478', 'Lungelo', 'Ndlela', 'Mathematical Science', '230000478@stu.unizulu.ac.za', 2, '2025-11-05', '2025-09-11', '', '72.00', '230000478'],
+                    ['230000479', 'Zanele', 'Mthembu', 'Mathematical Science', '230000479@stu.unizulu.ac.za', 3, '2025-10-06', '2025-09-10', '', '73.00', '230000479'],
+                    ['230000480', 'Bongani', 'Shabalala', 'Mathematical Science', '230000480@stu.unizulu.ac.za', 2, '2025-11-02', '2025-09-09', '', '74.00', '230000480'],
+                    ['230000481', 'Thulani', 'Khumalo', 'Mathematical Science', '230000481@stu.unizulu.ac.za', 2, '2025-10-03', '2025-09-08', '', '75.00', '230000481'],
+                    ['230000482', 'Nokuthula', 'Gumede', 'Mathematical Science', '230000482@stu.unizulu.ac.za', 2, '2025-11-04', '2025-09-07', '', '76.00', '230000482'],
+                    ['230000483', 'Mandla', 'Ngema', 'Mathematical Science', '230000483@stu.unizulu.ac.za', 3, '2025-10-07', '2025-09-06', '', '77.00', '230000483'],
+                    ['230000484', 'Ayanda', 'Mabena', 'Mathematical Science', '230000484@stu.unizulu.ac.za', 2, '2025-11-08', '2025-09-05', '', '78.00', '230000484'],
+                    ['230000485', 'Nomusa', 'Mazibuko', 'Mathematical Science', '230000485@stu.unizulu.ac.za', 2, '2025-10-09', '2025-09-04', '', '79.00', '230000485'],
+                    ['230000486', 'Siphesihle', 'Mabhuza', 'Mathematical Science', '230000486@stu.unizulu.ac.za', 2, '2025-11-10', '2025-09-03', '', '80.00', '230000486'],
+                    ['230000487', 'Themba', 'Ndaba', 'Mathematical Science', '230000487@stu.unizulu.ac.za', 3, '2025-10-11', '2025-09-02', '', '81.00', '230000487'],
+                    ['230000488', 'Lerato', 'Mntambo', 'Mathematical Science', '230000488@stu.unizulu.ac.za', 2, '2025-11-12', '2025-09-01', '', '82.00', '230000488'],
+                    ['230000489', 'Vusi', 'Mavuso', 'Mathematical Science', '230000489@stu.unizulu.ac.za', 2, '2025-10-13', '2025-08-31', '', '83.00', '230000489'],
+                    ['230000490', 'Hlengiwe', 'Khumalo', 'Mathematical Science', '230000490@stu.unizulu.ac.za', 2, '2025-11-14', '2025-08-30', '', '84.00', '230000490'],
+                    ['230000491', 'Nkosi', 'Mabaso', 'Mathematical Science', '230000491@stu.unizulu.ac.za', 3, '2025-10-15', '2025-08-29', '', '85.00', '230000491'],
+                    ['230000492', 'Nandi', 'Mthethwa', 'Mathematical Science', '230000492@stu.unizulu.ac.za', 2, '2025-11-16', '2025-08-28', '', '86.00', '230000492'],
+                    ['230000493', 'Phumlani', 'Makhanya', 'Mathematical Science', '230000493@stu.unizulu.ac.za', 2, '2025-10-17', '2025-08-27', '', '87.00', '230000493'],
+                    ['230000494', 'Zodwa', 'Cele', 'Mathematical Science', '230000494@stu.unizulu.ac.za', 2, '2025-11-18', '2025-08-26', '', '88.00', '230000494'],
+                    ['230000495', 'Buhle', 'Mthembu', 'Mathematical Science', '230000495@stu.unizulu.ac.za', 3, '2025-10-19', '2025-08-25', '', '89.00', '230000495'],
+                    ['230000496', 'Sifiso', 'Dube', 'Mathematical Science', '230000496@stu.unizulu.ac.za', 2, '2025-11-20', '2025-08-24', '', '90.00', '230000496'],
+                    ['230000497', 'Nokwanda', 'Sibanda', 'Mathematical Science', '230000497@stu.unizulu.ac.za', 2, '2025-10-21', '2025-08-23', '', '91.00', '230000497'],
+                    ['230000498', 'Tshilidzi', 'Netshivhumbe', 'Mathematical Science', '230000498@stu.unizulu.ac.za', 2, '2025-11-22', '2025-08-22', '', '92.00', '230000498'],
+                    ['230000499', 'Khanyisile', 'Mabena', 'Mathematical Science', '230000499@stu.unizulu.ac.za', 3, '2025-10-23', '2025-08-21', '', '93.00', '230000499'],
+                    ['230000500', 'Nkosinathi', 'Zondi', 'Mathematical Science', '230000500@stu.unizulu.ac.za', 2, '2025-11-24', '2025-08-20', '', '45.00', '230000500'],
+                    ['230000501', 'Sanele', 'Ntuli', 'Mathematical Science', '230000501@stu.unizulu.ac.za', 2, '2025-10-25', '2025-08-19', '', '46.00', '230000501'],
+                    ['230000502', 'Thando', 'Madzivhandila', 'Mathematical Science', '230000502@stu.unizulu.ac.za', 2, '2025-11-26', '2025-08-18', '', '47.00', '230000502'],
+                    ['230000503', 'Zuko', 'Mhlongo', 'Mathematical Science', '230000503@stu.unizulu.ac.za', 3, '2025-10-27', '2025-08-17', '', '48.00', '230000503'],
+                    ['230000504', 'Sihle', 'Mokwena', 'Mathematical Science', '230000504@stu.unizulu.ac.za', 2, '2025-11-28', '2025-08-16', '', '49.00', '230000504'],
+                    ['230000505', 'Yiba', 'Nkosi', 'Mathematical Science', '230000505@stu.unizulu.ac.za', 2, '2025-10-29', '2025-08-15', '', '50.00', '230000505'],
+                    ['230000506', 'Mbali', 'Dlamini', 'Mathematical Science', '230000506@stu.unizulu.ac.za', 2, '2025-11-30', '2025-08-14', '', '51.00', '230000506'],
+                    ['230000507', 'Ayabonga', 'Mkhwanazi', 'Mathematical Science', '230000507@stu.unizulu.ac.za', 3, '2025-10-01', '2025-08-13', '', '52.00', '230000507'],
+                    ['230000508', 'Zandile', 'Khanyile', 'Mathematical Science', '230000508@stu.unizulu.ac.za', 2, '2025-11-02', '2025-08-12', '', '53.00', '230000508'],
+                    ['230000509', 'Phakamani', 'Shange', 'Mathematical Science', '230000509@stu.unizulu.ac.za', 2, '2025-10-03', '2025-08-11', '', '54.00', '230000509'],
+                    ['230000510', 'Nqobile', 'Kekana', 'Mathematical Science', '230000510@stu.unizulu.ac.za', 2, '2025-11-04', '2025-08-10', '', '55.00', '230000510'],
+                    ['230000511', 'Lumka', 'Mkhize', 'Mathematical Science', '230000511@stu.unizulu.ac.za', 3, '2025-10-05', '2025-08-09', '', '56.00', '230000511'],
+                    ['230000512', 'Gugulethu', 'Mthetwa', 'Mathematical Science', '230000512@stu.unizulu.ac.za', 2, '2025-11-06', '2025-08-08', '', '57.00', '230000512'],
+                    ['230000513', 'Siyanda', 'Mhlongo', 'Mathematical Science', '230000513@stu.unizulu.ac.za', 2, '2025-10-07', '2025-08-07', '', '58.00', '230000513'],
+                    ['230000514', 'Nomalanga', 'Mabaso', 'Mathematical Science', '230000514@stu.unizulu.ac.za', 2, '2025-11-08', '2025-08-06', '', '59.00', '230000514'],
+                    ['230000515', 'Bongiwe', 'Ndlovu', 'Mathematical Science', '230000515@stu.unizulu.ac.za', 3, '2025-10-09', '2025-08-05', '', '60.00', '230000515'],
+                    ['230000516', 'Sipho', 'Ndlovu', 'Mathematical Science', '230000516@stu.unizulu.ac.za', 2, '2025-11-10', '2025-08-04', '', '61.00', '230000516'],
+                    ['230000517', 'Nomfundo', 'Msimang', 'Mathematical Science', '230000517@stu.unizulu.ac.za', 2, '2025-10-11', '2025-08-03', '', '62.00', '230000517']
+                ];
+
+                // Students sheet will be created after performance data is generated
+                // so we can compute `assessment_avg` from the performance records
+                // and include it in the students sheet before appending.
+
+                // Performance Data
+                const performanceData = [
+                    ['student_id', 'subject_code', 'subject_name', 'mark', 'max_mark', 'grade', 'assessment_type', 'assessment_date', 'semester', 'academic_year'],
+                    // Sample performance records for each student (3 subjects each)
+                    ...generatePerformanceData(studentsData.slice(1)) // Skip header row
+                ];
+
+                // Calculate assessment averages per student from performanceData
+                // (we compute this now so we can add `assessment_avg` to studentsData)
+                const perfRecords = performanceData.slice(1);
+                const assessmentAverages = {};
+                perfRecords.forEach(rec => {
+                    const sid = rec[0];
+                    const mark = Number(rec[3]);
+                    if (!assessmentAverages[sid]) assessmentAverages[sid] = { sum: 0, count: 0 };
+                    assessmentAverages[sid].sum += mark;
+                    assessmentAverages[sid].count += 1;
+                });
+
+                // Fill assessment_avg into studentsData (header is at index 0)
+                for (let i = 1; i < studentsData.length; i++) {
+                    const sid = studentsData[i][0];
+                    let avg = '';
+                    if (assessmentAverages[sid]) {
+                        avg = (assessmentAverages[sid].sum / assessmentAverages[sid].count).toFixed(2);
+                    }
+                    // studentsData header includes assessment_avg at index 8
+                    studentsData[i][8] = avg;
+                }
+
+                // Now create and append the Students sheet with assessment_avg populated
+                const studentsSheet = XLSX.utils.aoa_to_sheet(studentsData);
+                XLSX.utils.book_append_sheet(workbook, studentsSheet, 'Students');
+
+                const performanceSheet = XLSX.utils.aoa_to_sheet(performanceData);
+                XLSX.utils.book_append_sheet(workbook, performanceSheet, 'Performance');
+
+                // Risk Predictions Data
+                const riskPredictionsData = [
+                    ['student_id', 'risk_level', 'prediction_date', 'recommendation', 'risk_score'],
+                    ...generateRiskPredictions(performanceData.slice(1)) // Skip header row
+                ];
+
+                const riskPredictionsSheet = XLSX.utils.aoa_to_sheet(riskPredictionsData);
+                XLSX.utils.book_append_sheet(workbook, riskPredictionsSheet, 'Risk_Predictions');
+
+                // Attendance Data
+                const attendanceData = [
+                    ['student_id', 'course_id', 'attendance_percentage'],
+                    ...studentsData.slice(1).map(student => [
+                        student[0], // student_id
+                        1, // course_id
+                        (Math.random() * 30 + 70).toFixed(1) // attendance_percentage (70-100%)
+                    ])
+                ];
+
+                const attendanceSheet = XLSX.utils.aoa_to_sheet(attendanceData);
+                XLSX.utils.book_append_sheet(workbook, attendanceSheet, 'Attendance');
+
+                // LMS Activity Data
+                const lmsActivityData = [
+                    ['student_id', 'lms_activity_score'],
+                    ...studentsData.slice(1).map(student => [
+                        student[0], // student_id
+                        (Math.random() * 40 + 60).toFixed(1) // lms_activity_score (60-100%)
+                    ])
+                ];
+
+                const lmsActivitySheet = XLSX.utils.aoa_to_sheet(lmsActivityData);
+                XLSX.utils.book_append_sheet(workbook, lmsActivitySheet, 'LMS_Activity');
+
+                // Interventions Data (for high-risk students)
+                const interventionsData = [
+                    ['student_id', 'intervention_type', 'intervention_date', 'due_date', 'owner', 'description', 'outcome'],
+                    ...generateInterventions(riskPredictionsData.slice(1)) // Skip header row
+                ];
+
+                const interventionsSheet = XLSX.utils.aoa_to_sheet(interventionsData);
+                XLSX.utils.book_append_sheet(workbook, interventionsSheet, 'Interventions');
+
+                // Add this after generating performance data
+                const assessmentsData = generateAssessmentsData(studentsData.slice(1));
+                const assessmentsSheet = XLSX.utils.aoa_to_sheet(assessmentsData);
+                XLSX.utils.book_append_sheet(workbook, assessmentsSheet, 'Assessments');
+
+                // Generate Excel file and trigger download
+                const fileName = `unizulu_45_students_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(workbook, fileName);
+
+                // Show success message
+                showMessage('Excel file with 45 students downloaded successfully! You can now upload it to the Lecturer Dashboard.', 'success');
+                
+            } catch (error) {
+                console.error('Error generating Excel file:', error);
+                showMessage('Error generating Excel file. Please try again.', 'error');
+            } finally {
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Helper functions
+
+        // Returns n random elements from array
+        function getRandomSubjects(subjects, n) {
+            const arr = subjects.slice();
+            const result = [];
+            for (let i = 0; i < n; i++) {
+                const idx = Math.floor(Math.random() * arr.length);
+                result.push(arr[idx]);
+                arr.splice(idx, 1);
+            }
+            return result;
+        }
+
+        // Returns grade string based on mark
+        function calculateGrade(mark) {
+            if (mark >= 75) return 'A';
+            if (mark >= 65) return 'B';
+            if (mark >= 50) return 'C';
+            if (mark >= 40) return 'D';
+            return 'F';
+        }
+
+        // Returns a random date between start and end
+        function randomDate(start, end) {
+            const startTime = start.getTime();
+            const endTime = end.getTime();
+            const randomTime = startTime + Math.random() * (endTime - startTime);
+            return new Date(randomTime);
+        }
+
+        function generatePerformanceData(students) {
+            const performanceData = [];
+            const subjects = [
+                { code: 'STAT101', name: 'Elementary Statistics' },
+                { code: 'MATH101', name: 'Calculus I' },
+                { code: 'PHY101', name: 'Physics I' },
+                { code: 'CHE101', name: 'Chemistry I' }
+            ];
+
+            students.forEach(student => {
+                // Each student gets 3 random subjects
+                const studentSubjects = getRandomSubjects(subjects, 3);
+                
+                studentSubjects.forEach(subject => {
+                    const mark = Math.floor(Math.random() * 40) + 30; // 30-70 range
+                    const maxMark = 100;
+                    const grade = calculateGrade(mark);
+                    const assessmentType = ['Exam', 'Test', 'Assignment'][Math.floor(Math.random() * 3)];
+                    const assessmentDate = randomDate(new Date(20, 7, 1), new Date()).toISOString().split('T')[0];
+                    const semester = 2;
+                    const academicYear = 2025;
+                    
+                    performanceData.push([
+                        student[0], // student_id
+                        subject.code,
+                        subject.name,
+                        mark,
+                        maxMark,
+                        grade,
+                        assessmentType,
+                        assessmentDate,
+                        semester,
+                        academicYear
+                    ]);
+                });
+            });
+
+            return performanceData;
+        }
+
+        function generateRiskPredictions(performanceData) {
+            const riskData = [];
+            const studentPerformance = {};
+            
+            // Group performance by student
+            performanceData.forEach(record => {
+                const studentId = record[0];
+                if (!studentPerformance[studentId]) {
+                    studentPerformance[studentId] = [];
+                }
+                studentPerformance[studentId].push(record);
+            });
+            
+            // Calculate risk for each student
+            Object.keys(studentPerformance).forEach(studentId => {
+                const performances = studentPerformance[studentId];
+                let totalScore = 0;
+                
+                performances.forEach(record => {
+                    totalScore += record[3]; // mark
+                });
+                
+                const avgScore = totalScore / performances.length;
+                let riskLevel, recommendation;
+                
+                if (avgScore >= 90) {
+                    riskLevel = 'Low';
+                    recommendation = 'Student is performing excellently. Continue current support.';
+                } else if (avgScore >= 65) {
+                    riskLevel = 'Medium';
+                    recommendation = 'Student is performing adequately but could benefit from additional support.';
+                } else if (avgScore >= 50) {
+                    riskLevel = 'High';
+                    recommendation = 'Student is at risk of academic failure. Implement intervention strategies.';
+                } else {
+                    riskLevel = 'Very High';
+                    recommendation = 'Student is in critical academic danger. Urgent intervention required.';
+                }
+                
+                const predictionDate = randomDate(new Date(2025, 8, 1), new Date()).toISOString().split('T')[0];
+                
+                riskData.push([
+                    studentId,
+                    riskLevel,
+                    predictionDate,
+                    recommendation,
+                    avgScore.toFixed(2)
+                ]);
+            });
+            
+            return riskData;
+        }
+
+        function generateInterventions(riskData) {
+            const interventions = [];
+            const interventionTypes = [
+                'Academic Tutoring', 'Counseling Session', 'Progress Meeting', 
+                'Study Skills Workshop', 'Academic Warning', 'Mentoring Program'
+            ];
+            
+            // Get high and very high risk students
+            const highRiskStudents = riskData.filter(row => 
+                row[1] === 'High' || row[1] === 'Very High'
+            );
+            
+            highRiskStudents.forEach(student => {
+                const studentId = student[0];
+                const interventionType = interventionTypes[Math.floor(Math.random() * interventionTypes.length)];
+                const interventionDate = randomDate(new Date(2025, 8, 1), new Date()).toISOString().split('T')[0];
+                const dueDate = new Date(interventionDate);
+                dueDate.setDate(dueDate.getDate() + 7);
+                const owner = ['Lecturer', 'Advisor', 'Counselor'][Math.floor(Math.random() * 3)];
+                const description = `${interventionType} for student ${studentId} - ${student[3]}`;
+                const outcome = ['Scheduled', 'Ongoing', 'Completed'][Math.floor(Math.random() * 3)];
+                
+                interventions.push([
+                    studentId,
+                    interventionType,
+                    interventionDate,
+                    dueDate.toISOString().split('T')[0],
+                    owner,
+                    description,
+                    outcome
+                ]);
+            });
+            
+            return interventions;
+        }
+
+        function generateAssessmentsData(students) {
+            const assessmentsData = [
+                ['student_id', 'course_id', 'assessment_type', 'score', 'max_score']
+            ];
+
+            students.forEach(student => {
+                const assessmentTypes = ['Assignment 1', 'Assignment 2', 'Assignment 3', 'Assignment 4'];
+                
+                assessmentTypes.forEach(assessmentType => {
+                    const score = Math.floor(Math.random() * 40) + 30; // 30-70 range
+                    const maxScore = 100;
+                    
+                    assessmentsData.push([
+                        student[0], // student_id
+                        1, // course_id
+                        assessmentType,
+                        score,
+                        maxScore
+                    ]);
+                });
+            });
+
+            return assessmentsData;
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('downloadMessage');
+            messageDiv.textContent = message;
+            messageDiv.classList.remove('hidden');
+            messageDiv.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            
+            if (type === 'error') {
+                messageDiv.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                messageDiv.classList.add('bg-green-100', 'text-green-700');
+            }
+
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
